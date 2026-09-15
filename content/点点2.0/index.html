@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="点点 AI 2.0 项目案例：多模态输入与富文本输出体验设计。" />
+    <title>点点 AI 2.0 — WEB OF JEAN</title>
+    <link rel="stylesheet" href="./styles.css?v=1" />
+  </head>
+  <body>
+    <nav class="topbar" aria-label="页面导航">
+      <a class="topbar__back" href="../../index.html#work">← Home</a>
+      <a class="topbar__title" href="../moodie/index.html" aria-label="下一个项目：Moodie">Moodie →</a>
+    </nav>
+
+    <div class="page-shell">
+      <aside class="case-index" aria-label="项目目录">
+        <p class="case-index__title">Contents</p>
+        <a class="is-active" href="#overview">01&nbsp; 项目与背景</a>
+        <a href="#problem">02&nbsp; 用户困境</a>
+        <a href="#solution">03&nbsp; 设计方案</a>
+        <a href="#result">04&nbsp; 最终成果</a>
+        <a href="#other-work">05&nbsp; 其他参与</a>
+      </aside>
+
+      <main class="case-main">
+        <header class="hero">
+          <div class="hero__heading">
+            <p class="eyebrow">小红书实习项目</p>
+            <h1>点点 AI 2.0</h1>
+            <p class="hero__dek">在多模态输入与富文本输出之间，重新设计点点如何理解、回应真实的生活提问。</p>
+          </div>
+
+          <dl class="project-meta">
+            <div><dt>项目</dt><dd>小红书 · 点点 AI</dd></div>
+            <div><dt>角色</dt><dd>创新体验设计组实习生</dd></div>
+            <div><dt>周期</dt><dd>2025.08—2025.10</dd></div>
+            <div><dt>状态</dt><dd>需求均已上线</dd></div>
+          </dl>
+
+          <figure class="media media--hero" data-reveal>
+            <video autoplay muted loop playsinline preload="auto">
+              <source src="./videos/02-多模态输出/01-富文本交互演示.mp4" type="video/mp4" />
+            </video>
+          </figure>
+        </header>
+
+        <section class="section overview" id="overview">
+          <div class="section-head">
+            <p class="eyebrow">01 · 项目与背景</p>
+            <h2>真实感 AI 助手</h2>
+          </div>
+
+          <div class="two-column-copy">
+            <div>
+              <h3>About</h3>
+              <p>点点是一款基于小红书 UGC 生态的 AI 聊天应用。依托平台上亿真实用户的生活经验与内容数据，点点能够在各类生活场景中，为用户提供高效、精准、可信赖的答案。</p>
+            </div>
+            <div>
+              <h3>My role</h3>
+              <p>我在小红书创新体验设计组实习，独立参与点点的界面视觉优化及适配、多模态输入能力设计、多模态输出形式探索，均已跟进至正式上线。</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section chapter" id="problem">
+          <header class="chapter-title">
+            <p class="eyebrow">02 · 用户困境</p>
+            <h2>多图如何融入对话流</h2>
+            <p class="chapter-title__intro">单一文本输入难以充分承载用户的表达意图和场景信息。有些问题依赖图片或截图才能准确传达，用户也更倾向用更直接的方式降低描述成本——这对答案的准确度也有实际影响。</p>
+          </header>
+
+          <div class="stat-grid" data-reveal>
+            <article>
+              <p class="stat-grid__value" data-count-to="25" data-count-suffix="–40%">0%</p>
+              <p class="stat-grid__label">文本 Prompt 加入图像信息后，模型任务理解正确率平均提升</p>
+              <p class="stat-grid__source">OpenAI · GPT-4V 发布报告</p>
+            </article>
+            <article>
+              <p class="stat-grid__value" data-count-to="30" data-count-suffix="%">0%</p>
+              <p class="stat-grid__label">多模态交互场景中，用户完成任务的平均步骤数减少约</p>
+              <p class="stat-grid__source">Google · Gemini 公开案例</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section chapter" id="solution">
+          <header class="chapter-title">
+            <p class="eyebrow">03 · 设计方案</p>
+            <h2>图片是文字气泡还是新类型</h2>
+            <p class="chapter-title__intro">与 PM 沟通后，优先锁定两个重点环节：选择图片、图片发送。</p>
+          </header>
+
+          <div class="chapter-note" data-reveal>
+            <p class="caption">重点一 · 参照对象</p>
+            <h3>基于对产品的理解，对比了更偏向社交 App 类的交互。</h3>
+            <p>大部分 AI Chatbot（Kimi、ChatGPT 一类）传图的排列方式偏整齐、偏工具感；反而是 Apple Message、Instagram、Telegram 这类社交 App——图片按顺序散开、发送后带动效、看起来更活泼。点点想要的是接近社交 App 的沟通体感，所以传图和发送这两个环节，参照对象定在了社交 App，而不是其他 AI Chatbot。</p>
+          </div>
+
+          <figure class="media media--full" data-reveal>
+            <img src="./images/03-多模态输入/02-传图沟通-裁切.png" alt="传图沟通竞品对比：AI Chatbot 与社交 App 的传图方式对照" loading="lazy" />
+          </figure>
+
+          <p class="chapter-note__followup" data-reveal>基于这个方向，拆解出四个需要先回答的具体问题：</p>
+
+          <ol class="question-list question-list--standalone" data-reveal>
+            <li><span>01</span>传图片的比例和上限是什么？</li>
+            <li><span>02</span>图片显示区与文本区，融合结构还是拆分结构？</li>
+            <li><span>03</span>现有框架无发送按钮（更接近社交 App 体验），是否需要适配？</li>
+            <li><span>04</span>图片信息逻辑，定义为文字还是第二种信息？</li>
+          </ol>
+
+          <div class="positioning-block">
+            <div class="phone-compare" data-state="expanded" data-reveal>
+              <div class="phone-compare__copy">
+                <p class="caption">重点二 · 方案对比</p>
+                <h3>基于四个问题，做了展开态和收起态两版对比。</h3>
+                <div class="segmented-control" role="tablist" aria-label="切换对比方案状态">
+                  <button class="is-active" type="button" data-state="expanded" role="tab" aria-selected="true">展开态</button>
+                  <button type="button" data-state="collapsed" role="tab" aria-selected="false">收起态</button>
+                </div>
+                <div class="phone-compare__notes" aria-live="polite">
+                  <p class="phone-compare__note is-active" data-note="expanded">用于更直观地比较不同应对措施的结果——图片和文字是融合还是拆分、发送按钮是否需要保留。</p>
+                  <p class="phone-compare__note" data-note="collapsed">收起后的版本，验证信息密度降低后是否仍然清楚可读。</p>
+                </div>
+              </div>
+              <div class="phone-compare__stage">
+                <img class="phone-compare__image is-active" data-image="expanded" src="./images/03-多模态输入/03-对比方案.png" alt="展开态对比方案" />
+                <img class="phone-compare__image" data-image="collapsed" src="./images/03-多模态输入/04-收起的对比方案.png" alt="收起态对比方案" />
+              </div>
+            </div>
+          </div>
+
+          <div class="narrative-row" data-reveal>
+            <div class="narrative-row__copy">
+              <p class="caption">最终方案</p>
+              <p class="narrative-row__quote">与 PM 二次沟通后，我们确立了最终整体链路——将图片定义为「特殊的文字信息」，并确定了初版方案。</p>
+            </div>
+            <figure class="media media--board">
+              <img src="./images/03-多模态输入/05-最终链路.png" alt="多模态输入最终链路" loading="lazy" />
+            </figure>
+          </div>
+
+          <p class="chapter-note__followup" data-reveal>对于图片的开发规则交付文档</p>
+
+          <div class="media-pair" data-reveal>
+            <figure class="media media--board">
+              <img src="./images/03-多模态输入/07-图片气泡尺寸规则.png" alt="图片气泡尺寸与排布规则" loading="lazy" />
+            </figure>
+            <figure class="media media--board">
+              <img src="./images/03-多模态输入/08-图片气泡样式规则.png" alt="图片气泡样式规则" loading="lazy" />
+            </figure>
+          </div>
+        </section>
+
+        <section class="section chapter section--result" id="result">
+          <header class="chapter-title">
+            <p class="eyebrow">04 · 最终成果</p>
+            <h2>类 Ins 多图流</h2>
+          </header>
+
+          <div class="solution-block solution-block--single" data-reveal>
+            <div class="solution-block__stage">
+              <video class="result-video" autoplay muted loop controls playsinline preload="auto">
+                <source src="./videos/03-多模态输入/01-多模态输入演示.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="other-work">
+          <div class="section-head section-head--compact">
+            <p class="eyebrow">05 · 其他参与</p>
+            <h2>围绕同一个产品，持续补齐细节。</h2>
+            <p class="section-head__intro">除了多模态输入这条主线，我也参与了富文本输出的结构设计，以及点点深色模式的适配。</p>
+          </div>
+
+          <div class="other-explorer">
+            <div class="contribution-list contribution-list--interactive" role="tablist" aria-label="其他参与项目">
+              <button class="is-active" type="button" role="tab" aria-selected="true" data-other-target="richtext">
+                <span>01</span>
+                <div>
+                  <h3>多模态输出 · 富文本</h3>
+                  <p>把长文本回答整理成框架清晰、图文结合、来源可查的结构化内容。</p>
+                </div>
+                <b aria-hidden="true">+</b>
+              </button>
+              <button type="button" role="tab" aria-selected="false" data-other-target="longpress">
+                <span>02</span>
+                <div>
+                  <h3>长按面板 · 富文本</h3>
+                  <p>长按呼起功能面板，可查看小红书笔记来源，也能对关键词一键检索延伸阅读，让检索—验证—探索三步在同一界面内闭环。</p>
+                </div>
+                <b aria-hidden="true">+</b>
+              </button>
+              <button type="button" role="tab" aria-selected="false" data-other-target="dark">
+                <span>03</span>
+                <div>
+                  <h3>深色适配</h3>
+                  <p>以 Rive 动画衔接浅色与深色模式，语音输入态按钮变为发光按钮；独立对接 iOS / 安卓研发走查，保证最终实现与设计稿一致。</p>
+                </div>
+                <b aria-hidden="true">+</b>
+              </button>
+            </div>
+
+            <div class="other-preview" aria-live="polite">
+              <div class="other-preview__topline" data-other-next-trigger role="button" tabindex="0" aria-label="切换下一个项目">
+                <p data-other-title>长按面板 · 富文本</p>
+                <span>Next →</span>
+              </div>
+              <div class="other-preview__viewport">
+                <div class="other-preview__panel is-active" data-other-panel="richtext">
+                  <video class="is-active" autoplay muted loop controls playsinline preload="auto" poster="./images/02-多模态输出/01-富文本.png">
+                    <source src="./videos/02-多模态输出/01-富文本交互演示.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div class="other-preview__panel" data-other-panel="longpress">
+                  <video class="is-active" autoplay muted loop controls playsinline preload="auto">
+                    <source src="./videos/02-多模态输出/04-长按面板-04.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div class="other-preview__panel" data-other-panel="dark">
+                  <video class="is-active" autoplay muted loop controls playsinline preload="auto" poster="./images/04-深色适配/01-深色适配1.png">
+                    <source src="./videos/04-深色适配/01-深色适配演示.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="case-end-nav">
+            <span>点点 AI 2.0 · 2025</span>
+            <a href="../moodie/index.html">Moodie →</a>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./script.js?v=2"></script>
+  </body>
+</html>

@@ -1,0 +1,1003 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Moodie 启动动效 · 首页内嵌</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=block" rel="stylesheet" />
+    <style>
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        background: transparent;
+        overflow: hidden;
+      }
+      /* embedded snugly in an iframe sized to exactly match .frame (402x874) below —
+         no padding/centering needed the way the standalone preview page has it */
+      .stage {
+        min-height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* ---- 402 x 874 — same frame size as 主页-普通 / 主页-Moodie (139:5530 / 139:5572) ---- */
+      .frame {
+        position: relative;
+        width: 402px;
+        height: 874px;
+        background: #ffffff;
+        overflow: hidden;
+        border-radius: 46px;
+      }
+
+      .screen {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .screen--off { z-index: 1; }
+      .screen--on {
+        z-index: 2;
+        opacity: 0;
+      }
+      .frame[data-state="on"] .screen--off { opacity: 0; }
+      .frame[data-state="on"] .screen--on { opacity: 1; }
+
+      /* ---- shared chrome: status bar + bottom nav, real components, constant across off/on ---- */
+      .status-bar {
+        position: absolute;
+        top: 0; left: 0;
+        width: 402px; height: 54px;
+        z-index: 3;
+      }
+      .status-bar img { width: 100%; height: 100%; display: block; }
+
+      .home-indicator {
+        position: absolute;
+        left: 50%; bottom: 8px;
+        width: 144px; height: 5px;
+        transform: translateX(-50%);
+        background: #000000;
+        border-radius: 100px;
+        z-index: 8;
+      }
+
+      .bottom-nav {
+        position: absolute;
+        left: 0; top: 771px;
+        width: 402px; height: 103px;
+        z-index: 3;
+        overflow: hidden;
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.8));
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow:
+          0 -5px 20px rgba(0, 0, 0, 0.08),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      }
+      .bottom-nav__tabs {
+        position: absolute;
+        left: 50%; top: 17.98px;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 100px;
+        align-items: center;
+      }
+      .bottom-nav__tab {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: center;
+        width: 28px;
+      }
+      .bottom-nav__tab img { width: 24px; height: 24px; display: block; margin: 0 auto; }
+      .bottom-nav__tab span {
+        font: 400 14px/22px "PingFang SC", sans-serif;
+        letter-spacing: 0.7px;
+        color: #a3a3a3;
+        white-space: nowrap;
+      }
+      .bottom-nav__tab--active span { color: #714aff; }
+
+      /* ---- 普通模式 (off) real UI — node 139:5537 (search) / 139:5538 (chips) / 139:5548 (icons).
+         Fades out once the mode flips to "on" (covered by the wash by then anyway). ---- */
+      .off-ui { transition: opacity 200ms ease; }
+      .frame[data-state="on"] .off-ui { opacity: 0; pointer-events: none; }
+
+      .off-search {
+        position: absolute;
+        left: 31.58px; top: 84px; width: 354px; height: 56px;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        border-radius: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .off-search img { width: 20px; height: 20px; margin-left: 16.5px; display: block; }
+      .off-search span {
+        margin-left: 12px;
+        font: 400 14px/22px "PingFang SC", sans-serif;
+        letter-spacing: 0.7px;
+        color: #a3a3a3;
+      }
+
+      .off-chips {
+        position: absolute;
+        left: 31.58px; top: 151px;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .off-chip {
+        height: 32px;
+        padding: 6px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        border: 0.8px solid #e5e5e5;
+        border-radius: 12px;
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+        font: 400 14px/22px "PingFang SC", sans-serif;
+        letter-spacing: 0.7px;
+        color: #a3a3a3;
+        white-space: nowrap;
+      }
+
+      .off-icons { position: absolute; left: 0; top: 0; width: 402px; height: 874px; z-index: 4; }
+      .off-marker { position: absolute; }
+      .off-marker--a, .off-marker--b, .off-marker--d, .off-marker--e {
+        width: 20px; height: 20px;
+        filter: drop-shadow(0 0 2.5px rgba(0, 0, 0, 0.12));
+      }
+      .off-marker--a img.base, .off-marker--b img.base, .off-marker--d img.base, .off-marker--e img.base {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+      }
+      .off-marker__glyph { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: block; }
+      .off-marker--a .off-marker__glyph { width: 11px; height: 11px; }
+      .off-marker--b .off-marker__glyph { width: 11.8px; height: 11.8px; }
+      .off-marker--d .off-marker__glyph { width: 9.6px; height: 9.6px; }
+      .off-marker--e .off-marker__glyph { width: 12px; height: 12px; }
+      .off-marker--c { width: 26.548px; height: 32.869px; }
+      .off-marker--c img { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15)); }
+      .off-marker--f { width: 25px; height: 25px; }
+      .off-marker--f img { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+      /* ---- splash intro (node 139:6242, "初始页面") — plays once on load, then fades out ---- */
+      .splash {
+        position: absolute;
+        inset: 0;
+        z-index: 9;
+        background: #ffffff;
+        opacity: 1;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+      .splash.is-leaving {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 700ms ease;
+      }
+      .splash-content {
+        position: absolute;
+        left: 50%; top: 317px;
+        width: 112px; height: 139.519px;
+        transform: translateX(-50%);
+      }
+      .splash-content__inner {
+        position: absolute;
+        left: 50%; top: 50%;
+        width: 112px;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      /* entrance: icon, then each text line, pop up from slightly below with their own delay —
+         a wrapper carries the fade/rise so it doesn't collide with moodieBreathe's own transform
+         on the svg itself (two animations touching the same property would just clobber each other). */
+      @keyframes splashPieceIn {
+        0%   { opacity: 0; transform: translateY(14px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      .splash-icon-wrap {
+        display: block;
+        opacity: 0;
+        transform: translateY(14px);
+        animation: splashPieceIn 460ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .moodie-icon {
+        width: 65px; height: 71.913px;
+        display: block;
+        animation: moodieBreathe 4s ease-in-out infinite;
+      }
+      @keyframes moodieBreathe {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.01); }
+      }
+      .splash-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 112px;
+        line-height: 28px;
+        color: #171717;
+        text-align: center;
+      }
+      .splash-text p {
+        margin: 0; width: 100%;
+        opacity: 0;
+        transform: translateY(14px);
+        animation: splashPieceIn 460ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .splash-text p:first-child { font-weight: 600; font-size: 20px; animation-delay: 120ms; }
+      .splash-text p:last-child { font-weight: 500; font-size: 16px; animation-delay: 220ms; }
+
+      /* ---- translucent filled disc that grows from the Moodie button anchor until it floods the whole frame ----
+         backdrop-filter blurs the actual screenshot content sitting BEHIND this shape (frosted-glass —
+         "the area that's been rendered over goes blurry"), not the shape's own pixels. width/height are
+         animated directly (not transform:scale) so the blur radius stays a constant, predictable 22px
+         instead of ballooning as the shape grows. A soft-edged mask fades both the blur and the color
+         tint out at the boundary, so there's no hard circular edge anywhere. */
+      .wash {
+        position: absolute;
+        left: 355.58px;
+        top: 711.05px;
+        width: 60px;
+        height: 60px;
+        z-index: 5;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        backdrop-filter: blur(9px);
+        -webkit-backdrop-filter: blur(9px);
+        background: radial-gradient(
+          circle closest-side,
+          rgba(123, 11, 255, 0.4) 0%,
+          rgba(90, 70, 255, 0.36) 40%,
+          rgba(20, 150, 255, 0.32) 70%,
+          rgba(1, 209, 255, 0.22) 90%,
+          rgba(1, 209, 255, 0) 100%
+        );
+        mask-image: radial-gradient(circle closest-side, black 0%, black 55%, transparent 100%);
+        -webkit-mask-image: radial-gradient(circle closest-side, black 0%, black 55%, transparent 100%);
+      }
+      .wash.is-active {
+        animation: washGrow 1300ms cubic-bezier(0.45, 0, 0.35, 1) forwards;
+      }
+      @keyframes washGrow {
+        0%   { width: 60px;   height: 60px;   opacity: 0; }
+        10%  { opacity: 1; }
+        68%  { width: 1700px; height: 1700px; opacity: 1; }
+        100% { width: 1700px; height: 1700px; opacity: 0; }
+      }
+
+      /* ---- 中间态 cascade: the wash's own blur hands off directly into this hazy layer with no gap
+         (haze snaps to full opacity the instant it starts — it overlaps the wash's fading tail rather
+         than waiting for the wash to fully clear first, so content never flashes sharp in between).
+         Matches Figma "中间态1" (node 142:6278). Then search bar → chip groups → icon layer pop into
+         sharp focus one at a time — a "transformation" reveal. Only plays when turning Moodie ON;
+         reverting just relies on the wash alone. ---- */
+      .haze {
+        position: absolute;
+        inset: 0;
+        z-index: 6;
+        pointer-events: none;
+        opacity: 0;
+        background: rgba(255, 255, 255, 0.4);
+      }
+      .haze__img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: blur(14px);
+      }
+      .frame[data-cascade="on"] .haze {
+        animation: hazeLife 5150ms ease forwards;
+      }
+      @keyframes hazeLife {
+        0%   { opacity: 0; }
+        6%   { opacity: 1; }
+        92%  { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      /* ---- real sub-components (not a screenshot crop) — each one individually pops in, so the
+         reveal happens part-by-part inside each component too, not just as one block. ---- */
+      .pop-item {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      .frame[data-cascade="on"] .pop-item {
+        animation: popIn 420ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        animation-delay: var(--d, 0ms);
+      }
+      @keyframes popIn {
+        0%   { opacity: 0; transform: scale(0.5); }
+        55%  { opacity: 1; transform: scale(1.14); }
+        75%  { opacity: 1; transform: scale(0.94); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+
+      /* search bar — node 139:5620. Three-stage entrance:
+         1) Ellipse 2 (the Moodie ring) grows in softly, then breathes — it IS Moodie, so it leads.
+         2) the pill shape grows out from the ring's position, in both directions, via scaleX with
+            transform-origin pinned at the ring — text is a separate layer so it never gets squished.
+         3) once grown, a quick gradient sweep runs once around the border as a closing accent, then
+            settles back to the normal static border. Built as inline SVG (stroke + linearGradient +
+            animateTransform) rather than a CSS mask-composite trick — the mask approach rendered a
+            broken/missing segment along the top edge in testing, so this uses the same SVG-gradient
+            technique already proven reliable on the splash icon. */
+      .reveal-search {
+        position: absolute;
+        left: 24px; top: 84px; width: 354px; height: 56px;
+        z-index: 7;
+      }
+      .reveal-search__shape {
+        position: absolute;
+        inset: 0;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transform-origin: 92.3% 50%;
+        transform: scaleX(0.001);
+        opacity: 0;
+      }
+      .frame[data-cascade="on"] .reveal-search__shape {
+        animation: searchShapeGrow 520ms cubic-bezier(0.22, 1, 0.36, 1) 550ms forwards;
+      }
+      @keyframes searchShapeGrow {
+        0%   { transform: scaleX(0.001); opacity: 0.4; }
+        100% { transform: scaleX(1); opacity: 1; }
+      }
+
+      /* real gradient stroke from Figma (Custom Angular, stroke weight 1.5, position Inside):
+         17% #7E8BFF, 59% #EDA4FF, 79% #C0E5FF, 100% #8FAFFF — not a flat color. The shape grows in
+         plain and borderless first; only once it's fully grown does this stroke fade in, then the
+         JS-triggered <animateTransform> below gives it one quick spin as the closing accent, then
+         it freezes back to the resting look. */
+      .reveal-search__flow {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .frame[data-cascade="on"] .reveal-search__flow {
+        animation: searchFlowAppear 250ms ease 1080ms forwards;
+      }
+      @keyframes searchFlowAppear { to { opacity: 1; } }
+
+      .reveal-search__text {
+        position: absolute;
+        left: 24px; top: 50%;
+        transform: translateY(-50%);
+        margin: 0;
+        font: 400 14px/22px "PingFang SC", sans-serif;
+        letter-spacing: 0.7px;
+        color: #a3a3a3;
+        white-space: nowrap;
+        opacity: 0;
+      }
+      .frame[data-cascade="on"] .reveal-search__text {
+        animation: searchTextFade 320ms ease 900ms forwards;
+      }
+      @keyframes searchTextFade { to { opacity: 1; } }
+
+      .reveal-search__ring {
+        position: absolute;
+        right: 11.5px; top: 50%;
+        width: 31.4px;
+        height: 27.5px;
+        transform: translateY(-50%) rotate(150deg) scale(0.4);
+        opacity: 0;
+      }
+      .frame[data-cascade="on"] .reveal-search__ring {
+        animation:
+          searchRingGrow 450ms ease-out 250ms forwards,
+          searchRingBreathe 2600ms ease-in-out 700ms infinite;
+      }
+      @keyframes searchRingGrow {
+        0%   { opacity: 0; transform: translateY(-50%) rotate(150deg) scale(0.4); }
+        100% { opacity: 1; transform: translateY(-50%) rotate(150deg) scale(1); }
+      }
+      @keyframes searchRingBreathe {
+        0%, 100% { transform: translateY(-50%) rotate(150deg) scale(1); }
+        50%      { transform: translateY(-50%) rotate(150deg) scale(1.08); }
+      }
+
+      /* chip groups — node 139:5633, 7 individual chips, each pops in on its own delay */
+      .reveal-chips {
+        /* Chip groups container top is 143px, but the pills sit ~8px inside it (their own
+           instances start at y:8/9 within the 50px-tall group), not flush with the top —
+           flattening that away is what made this read as too close to the search bar. */
+        position: absolute;
+        left: 24px; top: 151px;
+        z-index: 7;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .reveal-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 32px;
+        padding: 6px 12px;
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        border-radius: 12px;
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+        white-space: nowrap;
+        opacity: 0;
+        transform: translateX(160px);
+      }
+      .frame[data-cascade="on"] .reveal-chip {
+        animation-name: chipSlideIn;
+        animation-duration: 460ms;
+        animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+        animation-fill-mode: forwards;
+        animation-delay: var(--d, 0ms);
+      }
+      @keyframes chipSlideIn {
+        0%   { opacity: 0; transform: translateX(160px); }
+        20%  { opacity: 1; }
+        100% { opacity: 1; transform: translateX(0); }
+      }
+      .reveal-chip__icon { width: 23px; height: 23px; display: block; }
+      .reveal-chip__label {
+        font: 400 14px/22px "PingFang SC", sans-serif;
+        letter-spacing: 0.7px;
+        color: #a3a3a3;
+      }
+
+      /* icon / marker layer — node 139:5641, 13 individual pins, each pops in on its own delay */
+      /* The "icon" node in Figma is display:contents (a non-offsetting grouping wrapper) — its
+         children's coordinates are already absolute to the whole 402x874 screen, NOT relative to
+         its own local box. Adding this container's own (44.5, 218) offset on top double-counted
+         it, shifting every marker down-right by that much (marker 7 even landed below the visible
+         frame entirely). This container now spans the full frame at (0,0) so each marker's inline
+         left/top can be used exactly as Figma gives them. */
+      .reveal-icons {
+        position: absolute;
+        left: 0; top: 0; width: 402px; height: 874px;
+        z-index: 7;
+      }
+      .reveal-marker {
+        position: absolute;
+        width: 28.269px;
+        height: 35px;
+      }
+      .reveal-marker__shadow {
+        position: absolute;
+        left: 33.3%; right: 33.3%; bottom: 0; height: 12%;
+      }
+      .reveal-marker__pin {
+        position: absolute;
+        inset: 0 0 3.85% 0;
+        width: 100%; height: 96.15%;
+      }
+      .reveal-marker__icon {
+        position: absolute;
+        left: 50%; top: 42%;
+        width: 18px; height: 18px;
+        transform: translate(-50%, -50%);
+      }
+
+      /* "弹出窗/风景" popup card (node 146:7278) — replaces the regular marker at this spot, appears
+         once the whole marker cascade has landed. Two stages exactly as named in Figma:
+         "定位点" (anchor dot) appears first, then "icon本人" (card + icon) pops out on top of it with
+         a strong overshoot. */
+      .reveal-popup {
+        position: absolute;
+        left: 197.63px; top: 447.61px;
+        width: 45px; height: 56.14px;
+        z-index: 7;
+      }
+      .reveal-popup__dot {
+        position: absolute;
+        left: 50%; top: 55.47px;
+        width: 6px; height: 6px;
+        transform: translate(-50%, -50%) scale(0.3);
+        opacity: 0;
+      }
+      .frame[data-cascade="on"] .reveal-popup__dot {
+        animation-name: popupDotIn;
+        animation-duration: 260ms;
+        animation-timing-function: ease-out;
+        animation-fill-mode: forwards;
+        animation-delay: 4050ms;
+      }
+      @keyframes popupDotIn {
+        0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+        100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      }
+
+      .reveal-popup__body {
+        position: absolute;
+        left: 0; top: 0;
+        width: 45px; height: 50px;
+        transform-origin: 50% 92%;
+        opacity: 0;
+        transform: scale(0.2);
+      }
+      .frame[data-cascade="on"] .reveal-popup__body {
+        animation-name: popupBodyPop;
+        animation-duration: 500ms;
+        animation-timing-function: cubic-bezier(0.3, 1.7, 0.4, 1);
+        animation-fill-mode: forwards;
+        animation-delay: 4250ms;
+      }
+      @keyframes popupBodyPop {
+        0%   { opacity: 0; transform: scale(0.2); }
+        45%  { opacity: 1; transform: scale(1.5); }
+        65%  { opacity: 1; transform: scale(0.8); }
+        82%  { opacity: 1; transform: scale(1.15); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+      .reveal-popup__card { position: absolute; inset: 0; width: 100%; height: 100%; }
+      .reveal-popup__inset {
+        position: absolute;
+        left: 50%; top: 2.5px;
+        width: 40px; height: 40px;
+        border-radius: 6px;
+        background: #d1fadc;
+        transform: translateX(-50%);
+      }
+      .reveal-popup__icon {
+        position: absolute;
+        left: 50%; top: 23.06px;
+        width: 30px; height: 30px;
+        transform: translate(-50%, -50%);
+      }
+
+      /* ---- Moodie button — fixed anchor, node 139:5564 (off) / 139:5625 (on), 60x60 ---- */
+      .moodie-btn {
+        position: absolute;
+        left: 325.58px;
+        top: 681.05px;
+        width: 60px;
+        height: 60px;
+        z-index: 8;
+        border: none;
+        padding: 0;
+        border-radius: 999px;
+        cursor: pointer;
+        background: #ffffff;
+        transition: transform 150ms ease, box-shadow 300ms ease;
+      }
+      .moodie-btn:active { transform: scale(0.94); }
+      .frame[data-state="on"] .moodie-btn {
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
+        cursor: default;
+      }
+
+      .moodie-btn__icon {
+        position: absolute;
+        left: 50%;
+        top: 8.31px;
+        width: 39.212px;
+        height: 43.383px;
+        transform: translateX(-50%);
+        display: block;
+      }
+      .moodie-btn__icon--on { opacity: 0; }
+      .frame[data-state="on"] .moodie-btn__icon--off { opacity: 0; }
+      .frame[data-state="on"] .moodie-btn__icon--on { opacity: 1; }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="frame" data-state="off" id="frame">
+        <img class="screen screen--off" src="./assets/map-clean-bg.png" alt="地图背景" />
+        <img class="screen screen--on" src="./assets/map-clean-bg.png" alt="地图背景" />
+
+        <div class="status-bar"><img src="./assets/splash-status-bar.png" alt="" /></div>
+
+        <div class="off-ui">
+          <div class="off-search">
+            <img src="./assets/off-search-icon.svg" alt="" />
+            <span>从这里开始探索吧</span>
+          </div>
+          <div class="off-chips">
+            <div class="off-chip">收藏</div>
+            <div class="off-chip">景点</div>
+            <div class="off-chip">快餐</div>
+            <div class="off-chip">酒店</div>
+            <div class="off-chip">交通</div>
+            <div class="off-chip">公园</div>
+            <div class="off-chip">咖啡</div>
+            <div class="off-chip">打卡</div>
+            <div class="off-chip">加油站</div>
+          </div>
+          <div class="off-icons">
+            <div class="off-marker off-marker--a" style="left:239.5px; top:399px;">
+              <img class="base" src="./assets/off-marker-orange-base.svg" alt="" />
+              <img class="off-marker__glyph" src="./assets/off-marker-store-glyph.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--b" style="left:307.5px; top:218px;">
+              <img class="base" src="./assets/off-marker-green-base.svg" alt="" />
+              <img class="off-marker__glyph" src="./assets/off-marker-mountain-glyph.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--c" style="left:92.5px; top:303px;">
+              <img src="./assets/off-marker-teardrop.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--b" style="left:52.5px; top:555px;">
+              <img class="base" src="./assets/off-marker-green-base.svg" alt="" />
+              <img class="off-marker__glyph" src="./assets/off-marker-mountain-glyph.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--c" style="left:275.5px; top:455px;">
+              <img src="./assets/off-marker-teardrop.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--d" style="left:138.5px; top:388px;">
+              <img class="base" src="./assets/off-marker-dark-base.svg" alt="" />
+              <img class="off-marker__glyph" src="./assets/off-marker-dark-glyph.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--a" style="left:126.5px; top:506px;">
+              <img class="base" src="./assets/off-marker-orange-base.svg" alt="" />
+              <img class="off-marker__glyph" src="./assets/off-marker-store-glyph.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--c" style="left:183.5px; top:695px;">
+              <img src="./assets/off-marker-teardrop.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--e" style="left:248.5px; top:316px;">
+              <img class="base" src="./assets/off-marker-blue-base.svg" alt="" />
+              <img class="off-marker__glyph" src="./assets/off-marker-blue-glyph.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--f" style="left:205.5px; top:462px;">
+              <img src="./assets/off-marker-flag.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--e" style="left:44.5px; top:483px;">
+              <img class="base" src="./assets/off-marker-blue-base.svg" alt="" />
+              <img class="off-marker__glyph" src="./assets/off-marker-blue-glyph.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--b" style="left:295.5px; top:618px;">
+              <img class="base" src="./assets/off-marker-green-base.svg" alt="" />
+              <img class="off-marker__glyph" src="./assets/off-marker-mountain-glyph.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--e" style="left:92.5px; top:613px;">
+              <img class="base" src="./assets/off-marker-blue-base.svg" alt="" />
+              <img class="off-marker__glyph" src="./assets/off-marker-blue-glyph.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--d" style="left:332.5px; top:470px;">
+              <img class="base" src="./assets/off-marker-dark-base.svg" alt="" />
+              <img class="off-marker__glyph" src="./assets/off-marker-dark-glyph.svg" alt="" />
+            </div>
+            <div class="off-marker off-marker--a" style="left:329.5px; top:363px;">
+              <img class="base" src="./assets/off-marker-orange-base.svg" alt="" />
+              <img class="off-marker__glyph" src="./assets/off-marker-store-glyph.svg" alt="" />
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom-nav">
+          <div class="bottom-nav__tabs">
+            <div class="bottom-nav__tab bottom-nav__tab--active">
+              <img src="./assets/nav-icon-discover.svg" alt="" />
+              <span>探索</span>
+            </div>
+            <div class="bottom-nav__tab">
+              <img src="./assets/nav-icon-trip.svg" alt="" />
+              <span>行程</span>
+            </div>
+            <div class="bottom-nav__tab">
+              <img src="./assets/nav-icon-profile.svg" alt="" />
+              <span>我的</span>
+            </div>
+          </div>
+        </div>
+        <div class="home-indicator"></div>
+
+        <div class="wash" id="wash"></div>
+
+        <div class="haze" id="haze">
+          <img class="haze__img" src="./assets/map-clean-bg.png" alt="" />
+        </div>
+
+        <div class="reveal-search">
+          <div class="reveal-search__shape"></div>
+          <svg class="reveal-search__flow" viewBox="0 0 354 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.75" y="0.75" width="352.5" height="54.5" rx="19.25" stroke="url(#searchFlowGrad)" stroke-width="1.5" />
+            <defs>
+              <linearGradient id="searchFlowGrad" x1="0" y1="0" x2="354" y2="56" gradientUnits="userSpaceOnUse">
+                <stop offset="0.17" stop-color="#7e8bff" />
+                <stop offset="0.59" stop-color="#eda4ff" />
+                <stop offset="0.79" stop-color="#c0e5ff" />
+                <stop offset="1" stop-color="#8fafff" />
+                <animateTransform id="searchFlowSpinAnim" attributeName="gradientTransform" type="rotate" begin="indefinite" dur="650ms" repeatCount="1" from="0 177 28" to="360 177 28" fill="freeze" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <p class="reveal-search__text">让Moodie来帮忙吧...</p>
+          <img class="reveal-search__ring" src="./assets/mid-search-ring.svg" alt="" />
+        </div>
+
+        <div class="reveal-chips">
+          <div class="reveal-chip" style="--d:2050ms">
+            <img class="reveal-chip__icon" src="./assets/mid-chip-icon-shanhai.png" alt="" />
+            <span class="reveal-chip__label">山海自然</span>
+          </div>
+          <div class="reveal-chip" style="--d:2120ms">
+            <img class="reveal-chip__icon" src="./assets/mid-chip-icon-renwen.png" alt="" />
+            <span class="reveal-chip__label">人文艺术</span>
+          </div>
+          <div class="reveal-chip" style="--d:2190ms">
+            <img class="reveal-chip__icon" src="./assets/mid-chip-icon-chengshi.png" alt="" />
+            <span class="reveal-chip__label">城市漫游</span>
+          </div>
+          <div class="reveal-chip" style="--d:2260ms">
+            <img class="reveal-chip__icon" src="./assets/mid-chip-icon-duga.png" alt="" />
+            <span class="reveal-chip__label">松弛度假</span>
+          </div>
+          <div class="reveal-chip" style="--d:2330ms">
+            <img class="reveal-chip__icon" src="./assets/mid-chip-icon-huwai.png" alt="" />
+            <span class="reveal-chip__label">户外探索</span>
+          </div>
+          <div class="reveal-chip" style="--d:2400ms">
+            <img class="reveal-chip__icon" src="./assets/mid-chip-icon-shanhai.png" alt="" />
+            <span class="reveal-chip__label">山海自然</span>
+          </div>
+          <div class="reveal-chip" style="--d:2470ms">
+            <img class="reveal-chip__icon" src="./assets/mid-chip-icon-meishi.png" alt="" />
+            <span class="reveal-chip__label">美食之旅</span>
+          </div>
+        </div>
+
+        <div class="reveal-icons">
+          <div class="reveal-marker pop-item" style="left:239.5px; top:399px; --d:2950ms">
+            <img class="reveal-marker__shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+            <img class="reveal-marker__pin" src="./assets/mid-pin-shape.svg" alt="" />
+            <img class="reveal-marker__icon" src="./assets/mid-marker-icon-city.png" alt="" />
+          </div>
+          <div class="reveal-marker pop-item" style="left:307.5px; top:218px; --d:2995ms">
+            <img class="reveal-marker__shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+            <img class="reveal-marker__pin" src="./assets/mid-pin-shape.svg" alt="" />
+            <img class="reveal-marker__icon" src="./assets/mid-marker-icon-view.png" alt="" />
+          </div>
+          <div class="reveal-marker pop-item" style="left:92.5px; top:303px; --d:3040ms">
+            <img class="reveal-marker__shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+            <img class="reveal-marker__pin" src="./assets/mid-pin-shape.svg" alt="" />
+            <img class="reveal-marker__icon" src="./assets/mid-marker-icon-beach.png" alt="" />
+          </div>
+          <div class="reveal-marker pop-item" style="left:52.5px; top:555px; --d:3085ms">
+            <img class="reveal-marker__shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+            <img class="reveal-marker__pin" src="./assets/mid-pin-shape.svg" alt="" />
+            <img class="reveal-marker__icon" src="./assets/mid-marker-icon-camp.png" alt="" />
+          </div>
+          <div class="reveal-marker pop-item" style="left:275.5px; top:455px; --d:3130ms">
+            <img class="reveal-marker__shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+            <img class="reveal-marker__pin" src="./assets/mid-pin-shape.svg" alt="" />
+            <img class="reveal-marker__icon" src="./assets/mid-marker-icon-city.png" alt="" />
+          </div>
+          <div class="reveal-marker pop-item" style="left:126.5px; top:506px; --d:3175ms">
+            <img class="reveal-marker__shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+            <img class="reveal-marker__pin" src="./assets/mid-pin-shape.svg" alt="" />
+            <img class="reveal-marker__icon" src="./assets/mid-marker-icon-food.png" alt="" />
+          </div>
+          <div class="reveal-marker pop-item" style="left:183.5px; top:695px; --d:3220ms">
+            <img class="reveal-marker__shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+            <img class="reveal-marker__pin" src="./assets/mid-pin-shape.svg" alt="" />
+            <img class="reveal-marker__icon" src="./assets/mid-marker-icon-beach.png" alt="" />
+          </div>
+          <div class="reveal-marker pop-item" style="left:248.5px; top:316px; --d:3265ms">
+            <img class="reveal-marker__shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+            <img class="reveal-marker__pin" src="./assets/mid-pin-shape.svg" alt="" />
+            <img class="reveal-marker__icon" src="./assets/mid-marker-icon-pic.png" alt="" />
+          </div>
+          <div class="reveal-marker pop-item" style="left:44.5px; top:483px; --d:3355ms">
+            <img class="reveal-marker__shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+            <img class="reveal-marker__pin" src="./assets/mid-pin-shape.svg" alt="" />
+            <img class="reveal-marker__icon" src="./assets/mid-marker-icon-pic.png" alt="" />
+          </div>
+          <div class="reveal-marker pop-item" style="left:295.5px; top:618px; --d:3400ms">
+            <img class="reveal-marker__shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+            <img class="reveal-marker__pin" src="./assets/mid-pin-shape.svg" alt="" />
+            <img class="reveal-marker__icon" src="./assets/mid-marker-icon-city.png" alt="" />
+          </div>
+          <div class="reveal-marker pop-item" style="left:92.5px; top:613px; --d:3445ms">
+            <img class="reveal-marker__shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+            <img class="reveal-marker__pin" src="./assets/mid-pin-shape.svg" alt="" />
+            <img class="reveal-marker__icon" src="./assets/mid-marker-icon-city.png" alt="" />
+          </div>
+          <div class="reveal-marker pop-item" style="left:329.5px; top:363px; --d:3490ms">
+            <img class="reveal-marker__shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+            <img class="reveal-marker__pin" src="./assets/mid-pin-shape.svg" alt="" />
+            <img class="reveal-marker__icon" src="./assets/mid-marker-icon-food.png" alt="" />
+          </div>
+        </div>
+
+        <div class="reveal-popup">
+          <img class="reveal-popup__dot" src="./assets/popup-anchor-dot.svg" alt="" />
+          <div class="reveal-popup__body">
+            <img class="reveal-popup__card" src="./assets/popup-card-shape.svg" alt="" />
+            <div class="reveal-popup__inset"></div>
+            <img class="reveal-popup__icon" src="./assets/popup-icon-scenery.png" alt="" />
+          </div>
+        </div>
+
+        <button class="moodie-btn" id="moodieBtn" type="button" aria-label="切换 Moodie 模式">
+          <img class="moodie-btn__icon moodie-btn__icon--off" src="./assets/btn-moodie-off.svg" alt="" />
+          <img class="moodie-btn__icon moodie-btn__icon--on" src="./assets/btn-moodie-on.svg" alt="" />
+        </button>
+
+        <div class="splash" id="splash">
+          <div class="status-bar"><img src="./assets/splash-status-bar.png" alt="" /></div>
+          <div class="splash-content">
+            <div class="splash-content__inner">
+              <div class="splash-icon-wrap">
+              <svg class="moodie-icon" viewBox="0 0 65.8221 73.2181" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g id="moodie">
+                  <g id="Ellipse 2" filter="url(#splashFilter0)">
+                    <path d="M40.0095 2.5296C55.5181 5.1624 62.7121 23.9445 60.1655 41.1005C58.2121 58.3464 44.5225 70.0466 28.9482 67.7069C13.2847 65.9605 3.0389 51.1298 5.5871 33.9621C7.539 16.7279 24.2803 1.0763 40.0095 2.5296Z" stroke="url(#splashPaint0)" stroke-width="3.25">
+                      <animate attributeName="d" dur="5s" repeatCount="indefinite" calcMode="spline"
+                        keyTimes="0;0.25;0.5;0.75;1"
+                        keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1"
+                        values="M40.0095 2.5296C55.5181 5.1624 62.7121 23.9445 60.1655 41.1005C58.2121 58.3464 44.5225 70.0466 28.9482 67.7069C13.2847 65.9605 3.0389 51.1298 5.5871 33.9621C7.539 16.7279 24.2803 1.0763 40.0095 2.5296Z;
+                                M39.4578 5.4783C55.1319 7.2265 64.7884 24.2586 63.1316 41.5493C60.2884 58.6605 44.5225 70.0466 28.9482 67.7069C13.2847 65.9605 3.0389 51.1298 5.5871 33.9621C7.539 16.7279 23.8941 3.1403 39.4578 5.4783Z;
+                                M39.4578 5.4783C55.1319 7.2265 62.7121 23.9445 60.1655 41.1005C58.2121 58.3464 44.2108 72.1235 28.5028 70.6739C12.973 68.0374 3.0389 51.1298 5.5871 33.9621C7.539 16.7279 23.8941 3.1403 39.4578 5.4783Z;
+                                M39.4578 5.4783C55.1319 7.2265 62.7121 23.9445 60.1655 41.1005C58.2121 58.3464 44.5225 70.0466 28.9482 67.7069C13.2847 65.9605 0.9519 50.8976 2.6057 33.6303C5.452 16.4957 23.8941 3.1403 39.4578 5.4783Z;
+                                M40.0095 2.5296C55.5181 5.1624 62.7121 23.9445 60.1655 41.1005C58.2121 58.3464 44.5225 70.0466 28.9482 67.7069C13.2847 65.9605 3.0389 51.1298 5.5871 33.9621C7.539 16.7279 24.2803 1.0763 40.0095 2.5296Z"/>
+                    </path>
+                    <path d="M40.0095 2.5296C55.5181 5.1624 62.7121 23.9445 60.1655 41.1005C58.2121 58.3464 44.5225 70.0466 28.9482 67.7069C13.2847 65.9605 3.0389 51.1298 5.5871 33.9621C7.539 16.7279 24.2803 1.0763 40.0095 2.5296Z" stroke="url(#splashPaint1)" stroke-opacity="0.2" stroke-width="3.25">
+                      <animate attributeName="d" dur="5s" repeatCount="indefinite" calcMode="spline"
+                        keyTimes="0;0.25;0.5;0.75;1"
+                        keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1"
+                        values="M40.0095 2.5296C55.5181 5.1624 62.7121 23.9445 60.1655 41.1005C58.2121 58.3464 44.5225 70.0466 28.9482 67.7069C13.2847 65.9605 3.0389 51.1298 5.5871 33.9621C7.539 16.7279 24.2803 1.0763 40.0095 2.5296Z;
+                                M39.4578 5.4783C55.1319 7.2265 64.7884 24.2586 63.1316 41.5493C60.2884 58.6605 44.5225 70.0466 28.9482 67.7069C13.2847 65.9605 3.0389 51.1298 5.5871 33.9621C7.539 16.7279 23.8941 3.1403 39.4578 5.4783Z;
+                                M39.4578 5.4783C55.1319 7.2265 62.7121 23.9445 60.1655 41.1005C58.2121 58.3464 44.2108 72.1235 28.5028 70.6739C12.973 68.0374 3.0389 51.1298 5.5871 33.9621C7.539 16.7279 23.8941 3.1403 39.4578 5.4783Z;
+                                M39.4578 5.4783C55.1319 7.2265 62.7121 23.9445 60.1655 41.1005C58.2121 58.3464 44.5225 70.0466 28.9482 67.7069C13.2847 65.9605 0.9519 50.8976 2.6057 33.6303C5.452 16.4957 23.8941 3.1403 39.4578 5.4783Z;
+                                M40.0095 2.5296C55.5181 5.1624 62.7121 23.9445 60.1655 41.1005C58.2121 58.3464 44.5225 70.0466 28.9482 67.7069C13.2847 65.9605 3.0389 51.1298 5.5871 33.9621C7.539 16.7279 24.2803 1.0763 40.0095 2.5296Z"/>
+                    </path>
+                  </g>
+                  <g id="Rectangle 19" filter="url(#splashFilter1)">
+                    <rect x="21.2384" y="25.5932" width="4.06623" height="5.24801" rx="2.03312" fill="url(#splashPaint2)"/>
+                    <rect x="21.2384" y="25.5932" width="4.06623" height="5.24801" rx="2.03312" fill="url(#splashPaint3)" fill-opacity="0.2"/>
+                  </g>
+                  <g id="Rectangle 57" filter="url(#splashFilter2)">
+                    <rect x="35.3784" y="25.5932" width="4.06623" height="5.24801" rx="2.03312" fill="url(#splashPaint4)"/>
+                    <rect x="35.3784" y="25.5932" width="4.06623" height="5.24801" rx="2.03312" fill="url(#splashPaint5)" fill-opacity="0.2"/>
+                  </g>
+                </g>
+                <defs>
+                  <filter id="splashFilter0" x="-2.38419e-07" y="-2.68221e-07" width="65.8221" height="73.2181" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+                    <feGaussianBlur stdDeviation="1.33694" result="effect1_foregroundBlur_0_4"/>
+                  </filter>
+                  <filter id="splashFilter1" x="20.05" y="24.4048" width="6.44302" height="7.62479" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+                    <feGaussianBlur stdDeviation="0.594195" result="effect1_foregroundBlur_0_4"/>
+                  </filter>
+                  <filter id="splashFilter2" x="34.19" y="24.4048" width="6.44302" height="7.62479" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+                    <feGaussianBlur stdDeviation="0.594195" result="effect1_foregroundBlur_0_4"/>
+                  </filter>
+                  <linearGradient id="splashPaint0" x1="3.3125" y1="18.0123" x2="50.2851" y2="66.8924" gradientUnits="userSpaceOnUse">
+                    <animateTransform attributeName="gradientTransform" type="rotate" from="0 32.911 36.609" to="360 32.911 36.609" dur="5s" repeatCount="indefinite"/>
+                    <stop offset="0.63301" stop-color="#7B0BFF"/>
+                    <stop offset="0.946644" stop-color="#01D1FF"/>
+                  </linearGradient>
+                  <linearGradient id="splashPaint1" x1="70.2041" y1="36.4385" x2="8.52235" y2="79.4035" gradientUnits="userSpaceOnUse">
+                    <animateTransform attributeName="gradientTransform" type="rotate" from="0 32.911 36.609" to="360 32.911 36.609" dur="5s" repeatCount="indefinite"/>
+                    <stop stop-color="#0A05F8" stop-opacity="0.33"/>
+                    <stop offset="1" stop-color="white" stop-opacity="0.53"/>
+                  </linearGradient>
+                  <linearGradient id="splashPaint2" x1="28.235" y1="21.5605" x2="20.7496" y2="31.8471" gradientUnits="userSpaceOnUse">
+                    <stop offset="0.463542" stop-color="#7B0BFF"/>
+                    <stop offset="1" stop-color="#01D1FF"/>
+                  </linearGradient>
+                  <linearGradient id="splashPaint3" x1="21.4604" y1="28.2001" x2="25.0828" y2="29.2392" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#0A05F8" stop-opacity="0.33"/>
+                    <stop offset="1" stop-color="white" stop-opacity="0.53"/>
+                  </linearGradient>
+                  <linearGradient id="splashPaint4" x1="42.7003" y1="23.627" x2="35.3784" y2="31.4797" gradientUnits="userSpaceOnUse">
+                    <stop offset="0.463542" stop-color="#7B0BFF"/>
+                    <stop offset="1" stop-color="#01D1FF"/>
+                  </linearGradient>
+                  <linearGradient id="splashPaint5" x1="35.6004" y1="28.2001" x2="39.2228" y2="29.2392" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#0A05F8" stop-opacity="0.33"/>
+                    <stop offset="1" stop-color="white" stop-opacity="0.53"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              </div>
+              <div class="splash-text">
+                <p>Moodie</p>
+                <p>旅行从感受开始</p>
+              </div>
+            </div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const frame = document.getElementById("frame");
+      const wash = document.getElementById("wash");
+      const searchFlowSpinAnim = document.getElementById("searchFlowSpinAnim");
+      const splash = document.getElementById("splash");
+
+      function wait(ms) {
+        return new Promise((resolve) => window.setTimeout(resolve, ms));
+      }
+
+      function resetCascade() {
+        frame.removeAttribute("data-cascade");
+      }
+
+      // runs the wash → haze → cascade transition into "on", resolves once it's fully settled
+      function playMoodieOn() {
+        return new Promise((resolve) => {
+          resetCascade(); // clear any leftover cascade state before starting a fresh transition
+
+          wash.classList.remove("is-active");
+          void wash.offsetWidth; // restart the animation on repeated plays
+          wash.classList.add("is-active");
+
+          // swap the mode once the disc has grown enough to fully cover the frame (~68% of 1300ms)
+          window.setTimeout(() => {
+            frame.dataset.state = "on";
+
+            // start the haze immediately so it overlaps the wash's fading tail — the blur hands off
+            // continuously with no gap where content flashes sharp before going hazy again.
+            frame.setAttribute("data-cascade", "on");
+
+            // fire the search bar's one-shot gradient spin once the shape has finished growing
+            window.setTimeout(() => {
+              searchFlowSpinAnim.beginElement();
+            }, 1350);
+          }, 884);
+
+          // resolve once the whole sequence (wash + haze + cascade) has finished
+          window.setTimeout(resolve, 6100);
+        });
+      }
+
+      function resetToOff() {
+        frame.dataset.state = "off";
+        resetCascade();
+        wash.classList.remove("is-active");
+      }
+
+      wash.addEventListener("animationend", () => {
+        wash.classList.remove("is-active");
+      });
+
+      // this is a decorative hero loop, not the interactive demo — it just replays the whole
+      // splash → toggle sequence forever. The reset back to "off" happens while the splash is
+      // opaque and covering the frame again, so none of it is visible.
+      async function loop() {
+        while (true) {
+          await wait(2400); // splash hold — long enough to catch the icon's flow motion
+          splash.classList.add("is-leaving");
+          await wait(700); // splash fade-out
+          await wait(600); // pause on normal mode before switching
+          await playMoodieOn();
+          await wait(2200); // hold on the "on" screen
+          resetToOff();
+          splash.classList.remove("is-leaving"); // instantly covers everything again while reset
+          await wait(50);
+        }
+      }
+
+      loop();
+    </script>
+  </body>
+</html>

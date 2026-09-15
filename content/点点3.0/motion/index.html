@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta charset="utf-8" />
+  <title>点点 · App 展示动效</title>
+  <script>window.OM_SCENES = '[{"name":"Opening","dur":2.6,"desc":"手机落定，状态栏与点点头像浮现，开场介绍气泡弹入","nat":3.2},{"name":"Prompts","dur":3.8,"desc":"四条推荐问题气泡逐个弹性弹入并缓慢飘动"},{"name":"Ask","dur":1.6,"desc":"推荐问题收起，四张笔记卡带倾斜从下方依次飞入"},{"name":"Cards","dur":3.6,"desc":"卡片落定后，帮我种草推荐、整理总结、行程规划三个气泡一起弹出并飘动"},{"name":"Parse","dur":3.4,"desc":"卡片聚拢消隐，小红书链接解析卡上滑落位，红色小红书应用标弹入，用户追问气泡升起"},{"name":"Summary","dur":4.4,"desc":"点点回复气泡出现，总结长卡从下方上滑落位后静置，不再滚动"}]';</script>
+  <script>window.OM_PLAYBACK = '{"mode":"loop"}';</script>
+  <script>window.TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "motionEditor": false,
+    "drift": 1,
+    "bg": "#eef1f0",
+    "glow": "rgba(49,182,157,0.18)"
+  }/*EDITMODE-END*/;</script>
+  <style>
+    html, body { margin: 0; padding: 0; background: #eef1f0; }
+    a { color: #31b69d; }
+    a:hover { color: #0f8f78; }
+  </style>
+</helmet>
+<x-import component-from-global-scope="DianStage" from="./animations-v3.jsx ./tweaks-panel.jsx ./scene.jsx" hint-size="100%,100%"></x-import>
+</x-dc>
+</body>
+</html>

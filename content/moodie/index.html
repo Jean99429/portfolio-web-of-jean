@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Moodie 项目案例：从体验出发的智能旅行规划 App。" />
+    <title>Moodie — WEB OF JEAN</title>
+    <link rel="stylesheet" href="./styles.css?v=1" />
+  </head>
+  <body>
+    <nav class="topbar" aria-label="页面导航">
+      <a class="topbar__back" href="../../index.html#work">← Home</a>
+      <a class="topbar__title" href="../mahosojo/index.html" aria-label="下一个项目：Mahoshojo">Mahoshojo →</a>
+    </nav>
+
+    <div class="page-shell">
+      <aside class="case-index" aria-label="项目目录">
+        <p class="case-index__title">Contents</p>
+        <a class="is-active" href="#background">01&nbsp; 背景与契机</a>
+        <a href="#problem">02&nbsp; 现状问题</a>
+        <a href="#insight">03&nbsp; 洞察与结论</a>
+        <a href="#product">04&nbsp; 产品设计</a>
+      </aside>
+
+      <main class="case-main">
+        <header class="hero">
+          <div class="hero__heading">
+            <p class="eyebrow">Personal project</p>
+            <h1>Moodie</h1>
+            <p class="hero__dek">从体验出发的智能旅行规划 App —— 从"我想去哪"，到"我想感受什么"。</p>
+          </div>
+
+          <dl class="project-meta">
+            <div><dt>项目</dt><dd>Moodie</dd></div>
+            <div><dt>角色</dt><dd>产品设计</dd></div>
+            <div><dt>周期</dt><dd>2025</dd></div>
+            <div><dt>状态</dt><dd>概念产品 · 完整设计链路</dd></div>
+          </dl>
+
+          <figure class="media media--hero hero-carousel" data-reveal>
+            <div class="hero-carousel__stage">
+              <div class="hero-carousel__img hero-carousel__anim is-active">
+                <iframe class="hero-carousel__anim-frame" src="./hero-moodie-loop.html" title="Moodie 启动动效" tabindex="-1"></iframe>
+              </div>
+            </div>
+          </figure>
+        </header>
+
+        <section class="summary-strip" data-reveal aria-label="三秒摘要">
+          <p>从"我想去哪"到"我想感受什么"</p>
+          <p>一套体验标签系统，替代地名搜索框</p>
+          <p>Moodie 轻介入式 AI，决定去哪的那一步交给它</p>
+          <p>从选点到成行程，一键闭环</p>
+        </section>
+
+        <section class="section chapter" id="background">
+          <header class="chapter-title">
+            <p class="eyebrow">01 · Background</p>
+            <h2>从一段旅程的执念，到一个关于"感受"的追问</h2>
+          </header>
+
+          <div class="prose" data-reveal>
+            <p>在欧洲的半年里，我去了8个国家、14个城市。旅途中总会有一些瞬间——找到了那个城市最好看的日落，钻进一个能看到雪山的图书馆待了一下午，或者在挪威第一次坐上狗拉雪橇——会让人觉得，这一刻的"感觉"就是旅行的意义。</p>
+            <p>但这些体验很难提前规划——现有的工具只能按地点搜，没有办法告诉我"哪里可以看峡湾地貌"、"这个城市哪里最适合发呆"。每次想找这些，都要自己在不同平台反复碰运气。</p>
+          </div>
+
+          <p class="pull-quote" data-reveal>比起"我想去哪"，也许"我想感受什么"才是一趟旅程最初的起点。</p>
+
+          <div class="media-pair" data-reveal>
+            <figure class="media media--board">
+              <img src="./assets/bg-map-europe.jpg" alt="Google Maps 里收藏的欧洲旅行地点" loading="lazy" />
+            </figure>
+            <figure class="media media--board">
+              <img src="./assets/bg-map-madrid.jpg" alt="Google Maps 马德里收藏详情" loading="lazy" />
+            </figure>
+          </div>
+          <p class="media-pair__caption">Google map 中我的旅行收藏夹</p>
+        </section>
+
+        <section class="section chapter" id="problem">
+          <header class="chapter-title">
+            <p class="eyebrow">02 · Question</p>
+            <h2>现有工具的起点，从一开始就错了</h2>
+            <p class="chapter-title__intro">当我最近精力疲惫，想要通过轻松的夏日感旅行充电……没有任何工具支持这种搜索。现有旅行规划的起点往往，只能输入一个地名，反复多平台比对，最后艰难的筛选。</p>
+          </header>
+
+          <p class="pull-quote" data-reveal>因此，我希望能改变这个现状——从一开始就直观的检索"我想感受什么"，最大程度上降低决策成本。</p>
+
+          <div class="flip-grid" data-reveal>
+            <button class="flip-card" type="button" data-flip aria-label="不知道去哪，翻面查看方向">
+              <div class="flip-card__inner">
+                <div class="flip-card__face flip-card__face--front">
+                  <span class="flip-card__evidence"><img src="./assets/shot-shamian-search.png" alt="" aria-hidden="true" /></span>
+                  <h3>不知道去哪</h3>
+                  <p>想放松、想躺平、想体验新鲜感——冰冷的搜索框并不能检索这些</p>
+                </div>
+                <div class="flip-card__face flip-card__face--back">
+                  <span class="flip-card__icon"><img src="./assets/icon-wand.png" alt="" /></span>
+                  <p class="caption">个性化</p>
+                  <h3>地图编辑器</h3>
+                  <p>以地图为画布进行个性化的行程定制，效率更高，自由度更大</p>
+                </div>
+              </div>
+            </button>
+
+            <button class="flip-card" type="button" data-flip aria-label="规划和感受脱节，翻面查看方向">
+              <div class="flip-card__inner">
+                <div class="flip-card__face flip-card__face--front">
+                  <span class="flip-card__evidence"><img src="./assets/shot-guangzhou-dark.png" alt="" aria-hidden="true" /></span>
+                  <h3>规划和感受脱节</h3>
+                  <p>往往我们收藏景点时，渴望的是某种情感或行为，这些信息难以在地图App中体现</p>
+                </div>
+                <div class="flip-card__face flip-card__face--back">
+                  <span class="flip-card__icon"><img src="./assets/icon-ai.png" alt="" /></span>
+                  <p class="caption">AI 智能助手</p>
+                  <h3>快速信息整理</h3>
+                  <p>直接把体验偏好转化成行程，用户就可以专注于"我想要什么"，而不是"怎么规划"</p>
+                </div>
+              </div>
+            </button>
+
+            <button class="flip-card" type="button" data-flip aria-label="跨平台的零散信息，翻面查看方向">
+              <div class="flip-card__inner">
+                <div class="flip-card__face flip-card__face--front">
+                  <span class="icon-cluster" aria-hidden="true">
+                    <img src="./assets/icon-dianping.png" alt="" />
+                    <img src="./assets/icon-booking.png" alt="" />
+                    <img src="./assets/icon-xiaohongshu.png" alt="" />
+                    <img src="./assets/icon-gmaps-pin.png" alt="" />
+                    <img src="./assets/icon-trenit.png" alt="" />
+                  </span>
+                  <h3>跨平台的零散信息</h3>
+                  <p>攻略信息转成旅行规划时，大量的信息难以整合，导致信息丢失</p>
+                </div>
+                <div class="flip-card__face flip-card__face--back">
+                  <span class="flip-card__icon"><img src="./assets/icon-smiley.png" alt="" /></span>
+                  <p class="caption">情感化</p>
+                  <h3>新视角旅行规划</h3>
+                  <p>现有工具只能按地点搜——如果可以用"我想感受什么"来检索目的地，规划的起点才真正变了</p>
+                </div>
+              </div>
+            </button>
+          </div>
+          <p class="flip-hint">点击卡片 · 查看对应的设计方向</p>
+        </section>
+
+        <section class="section chapter" id="insight">
+          <header class="chapter-title">
+            <p class="eyebrow">03 · Insight</p>
+            <h2>70% 的人想换个地方换心情，却先被规划本身劝退</h2>
+          </header>
+
+          <div class="insight-block" data-reveal>
+            <p class="caption">User Research · 调研发现</p>
+            <p class="pull-quote pull-quote--small">超过70%受访者旅行的核心动机是"换个地方换心情"——本质上是一种情绪需求。更值得注意的是：繁琐的规划流程本身会直接劝退出行——很多人不是不想旅行，而是被规划这件事消耗掉了动力。</p>
+            <p class="prose-line">调研覆盖受访者的年龄结构、旅行频率、规划习惯与出行动机四方面。</p>
+            <div class="research-stats" data-reveal>
+              <div class="research-stat">
+                <p class="research-stat__num">72.73%</p>
+                <p class="research-stat__label">旅行动机是"换个地方，换心情"</p>
+              </div>
+              <div class="research-stat">
+                <p class="research-stat__num">81.82%</p>
+                <p class="research-stat__label">觉得自己旅游得不够</p>
+              </div>
+              <div class="research-stat">
+                <p class="research-stat__num">68.18%</p>
+                <p class="research-stat__label">没去旅行，是因为觉得规划太麻烦、没时间</p>
+              </div>
+              <div class="research-stat">
+                <p class="research-stat__num">90%+</p>
+                <p class="research-stat__label">规划要在小红书、地图等多个 App 间来回切换</p>
+              </div>
+            </div>
+            <p class="pull-quote pull-quote--strong">这意味着，一个从"体验出发"的规划工具，不只是让旅行更好，而是让旅行真正发生。</p>
+          </div>
+
+          <div class="journey" data-reveal id="journey">
+            <p class="caption">User Map · 旅程验证</p>
+            <h3>传统的旅行规划：出发之前就已经疲惫</h3>
+
+            <div class="journey-track">
+              <svg class="journey-curve" viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true">
+                <path class="journey-curve__path" d="M 0 60 L 250 130 L 500 100 L 750 160 L 1000 20" />
+              </svg>
+              <div class="journey-stage" style="--x:2%; --y:30%;">
+                <span class="journey-stage__emoji">🙂</span>
+                <p>产生旅游想法</p>
+              </div>
+              <div class="journey-stage" style="--x:25%; --y:65%;">
+                <span class="journey-stage__emoji">🤔</span>
+                <p>决定目的地</p>
+                <div class="journey-bubble" style="--delay:200ms;">决定目的地需要思考太多，累了</div>
+              </div>
+              <div class="journey-stage" style="--x:50%; --y:50%;">
+                <span class="journey-stage__emoji">😐</span>
+                <p>交通及住宿</p>
+              </div>
+              <div class="journey-stage" style="--x:75%; --y:80%;">
+                <span class="journey-stage__emoji">😩</span>
+                <p>整理具体行程</p>
+                <div class="journey-bubble" style="--delay:500ms;">切换很多平台，整合大量信息</div>
+              </div>
+              <div class="journey-stage" style="--x:98%; --y:10%;">
+                <span class="journey-stage__emoji">😆</span>
+                <p>旅行中</p>
+                <div class="journey-bubble" style="--delay:800ms;">查询困难，有变动又要从头开始</div>
+              </div>
+            </div>
+
+            <ul class="potential-list">
+              <li>基于用户期待的场景推荐，提升兴趣</li>
+              <li>支持导入链接，一键打点，解决繁琐的平台切换</li>
+            </ul>
+          </div>
+
+          <div class="market-block" data-reveal id="market">
+            <p class="caption">Market Analysis · 市场空白</p>
+            <h3>市面上很多 App，为什么旅行规划还是很复杂？</h3>
+
+            <div class="market-matrix">
+              <p class="market-matrix__axis market-matrix__axis--top">可编辑功能</p>
+              <p class="market-matrix__axis market-matrix__axis--left">与感受相关</p>
+              <div class="market-matrix__grid">
+                <div class="market-matrix__quad market-matrix__quad--gap" data-quad="gap">
+                  <span class="market-matrix__gap-label">从感受出发<br />落地成行程<br />—— 空白</span>
+                </div>
+                <div class="market-matrix__quad">
+                  <img src="./assets/logo-ctrip.png" alt="携程" style="--d:0ms" />
+                  <img src="./assets/logo-qunar.png" alt="去哪儿" style="--d:80ms" />
+                  <img src="./assets/logo-amap.png" alt="高德地图" style="--d:160ms" />
+                  <img src="./assets/logo-baidumap.png" alt="百度地图" style="--d:240ms" />
+                </div>
+                <div class="market-matrix__quad">
+                  <img src="./assets/logo-xiaohongshu.png" alt="小红书" style="--d:80ms" />
+                  <img src="./assets/logo-douyin.png" alt="抖音" style="--d:160ms" />
+                </div>
+                <div class="market-matrix__quad">
+                  <img src="./assets/logo-meituan.png" alt="美团" style="--d:160ms" />
+                  <img src="./assets/logo-mafengwo-pro.png" alt="马蜂窝" style="--d:240ms" />
+                </div>
+              </div>
+              <p class="market-matrix__axis market-matrix__axis--right">与地点相关</p>
+              <p class="market-matrix__axis market-matrix__axis--bottom">编辑受限</p>
+            </div>
+
+            <p class="prose-line">当前与旅行相关的 App 多集中在单一功能点上：现有工具要么帮你找感受（小红书、抖音），要么帮你规划地点（地图、攻略类）——但没有一款能把两件事同时做到。</p>
+            <p class="pull-quote">"从感受出发、落地成行程"这个位置，目前是空白的。</p>
+          </div>
+
+          <div class="conclusion-block" data-reveal>
+            <p class="caption">Conclusion</p>
+            <h3>根据优化后的流程，我设计了两套标签系统作为核心功能，这两套系统作为 Moodie（人工智能助手）推荐目的地的逻辑，形成整个旅行规划期间"感受出发"的闭环。</h3>
+
+            <div class="flow-progress" data-flow-progress>
+              <div class="flow-progress__bar"><span class="flow-progress__fill" data-flow-fill></span></div>
+              <ol class="flow-progress__list">
+                <li class="is-active" data-flow-step="1">
+                  <span>01</span>
+                  <h4>根据体验推荐选择地点</h4>
+                  <div class="flow-fan">
+                    <div class="flow-fan__card flow-fan__card--left"><img src="./assets/chip-city.png" alt="" /></div>
+                    <div class="flow-fan__card flow-fan__card--center"><img src="./assets/chip-nature.png" alt="" /></div>
+                    <div class="flow-fan__card flow-fan__card--right"><img src="./assets/chip-art.png" alt="" /></div>
+                  </div>
+                </li>
+                <li data-flow-step="2">
+                  <span>02</span>
+                  <h4>AI 一键规划</h4>
+                  <div class="flow-search-demo">
+                    <div class="flow-search-demo__box">
+                    <div class="reveal-search">
+                      <div class="reveal-search__shape"></div>
+                      <svg class="reveal-search__flow" viewBox="0 0 354 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0.75" y="0.75" width="352.5" height="54.5" rx="19.25" stroke="url(#searchFlowGrad2)" stroke-width="1.5" />
+                        <defs>
+                          <linearGradient id="searchFlowGrad2" x1="0" y1="0" x2="354" y2="56" gradientUnits="userSpaceOnUse">
+                            <stop offset="0.17" stop-color="#7e8bff" />
+                            <stop offset="0.59" stop-color="#eda4ff" />
+                            <stop offset="0.79" stop-color="#c0e5ff" />
+                            <stop offset="1" stop-color="#8fafff" />
+                            <animateTransform id="flowSearchSpinAnim" attributeName="gradientTransform" type="rotate" begin="indefinite" dur="650ms" repeatCount="1" from="0 177 28" to="360 177 28" fill="freeze" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <p class="reveal-search__text">让Moodie来帮忙吧...</p>
+                      <img class="reveal-search__ring" src="./assets/mid-search-ring.svg" alt="" />
+                    </div>
+                    <div class="reveal-search__typed"><span>Moodie，帮我生成路线</span></div>
+                    </div>
+                  </div>
+                </li>
+                <li data-flow-step="3">
+                  <span>03</span>
+                  <h4>出发</h4>
+                  <div class="flow-route-demo">
+                    <div class="flow-route-demo__canvas">
+                      <svg class="flow-route-demo__line" viewBox="0 0 83.736 163.686" width="83.736" height="163.686" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path class="flow-route-demo__path flow-route-demo__path--1" pathLength="1" d="M27.8085 100.097L25.584 107.949C25.2954 108.967 25.3415 110.052 25.7157 111.042C26.8054 113.927 25.0163 117.094 21.9831 117.65L7.4236 120.319C3.61641 121.017 1.45628 125.083 3.00969 128.629L7.59075 139.084C8.31712 140.741 9.75299 141.983 11.4983 142.462L15.7688 143.634C18.3746 144.349 20.1808 146.717 20.1808 149.42V163.686" stroke="url(#routeGrad1)" stroke-opacity="0.9" stroke-width="5"/>
+                        <path class="flow-route-demo__path flow-route-demo__path--2" pathLength="1" d="M82.3476 2.07906L67.4553 12.0237C64.5735 13.9481 63.9164 17.9067 66.0219 20.659L75.4099 32.9312C76.9302 34.9185 76.0177 37.8122 73.6324 38.5679C71.5721 39.2206 70.5426 41.5247 71.431 43.4949L76.2668 54.219C77.5486 57.0617 76.4392 60.4124 73.7142 61.9285L34.2936 83.8609" stroke="url(#routeGrad2)" stroke-opacity="0.9" stroke-width="5"/>
+                        <defs>
+                          <linearGradient id="routeGrad1" x1="13.888" y1="100.097" x2="13.888" y2="163.686" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#3478F5"/><stop offset="0.5" stop-color="#72F3FF"/><stop offset="1" stop-color="#714AFF"/>
+                          </linearGradient>
+                          <linearGradient id="routeGrad2" x1="58.3206" y1="2.07906" x2="58.3206" y2="83.8609" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#31D89B"/><stop offset="0.5" stop-color="#00DADA"/><stop offset="1" stop-color="#714AFF"/>
+                          </linearGradient>
+                        </defs>
+                      </svg>
+
+                      <div class="flow-route-demo__pin flow-route-demo__pin--bottom">
+                        <img class="flow-route-demo__pin-shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+                        <img class="flow-route-demo__pin-shape" src="./assets/mid-pin-shape.svg" alt="" />
+                        <img class="flow-route-demo__pin-icon" src="./assets/mid-marker-icon-city.png" alt="" />
+                      </div>
+                      <div class="flow-route-demo__pin flow-route-demo__pin--middle">
+                        <img class="flow-route-demo__pin-shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+                        <img class="flow-route-demo__pin-shape" src="./assets/mid-pin-shape.svg" alt="" />
+                        <img class="flow-route-demo__pin-icon" src="./assets/mid-marker-icon-pic.png" alt="" />
+                      </div>
+                      <div class="flow-route-demo__pin flow-route-demo__pin--top">
+                        <img class="flow-route-demo__pin-shadow" src="./assets/mid-pin-shadow.svg" alt="" />
+                        <img class="flow-route-demo__pin-shape" src="./assets/mid-pin-shape.svg" alt="" />
+                        <img class="flow-route-demo__pin-icon" src="./assets/mid-marker-icon-view.png" alt="" />
+                      </div>
+
+                      <div class="flow-route-demo__badge">
+                        <img class="flow-route-demo__badge-outer" src="./assets/route-badge-outer.svg" alt="" />
+                        <img class="flow-route-demo__badge-inner" src="./assets/route-badge-inner.svg" alt="" />
+                        <p class="flow-route-demo__badge-text">🚌 30min</p>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section class="section chapter" id="product">
+          <header class="chapter-title">
+            <p class="eyebrow">04 · Product</p>
+            <h2>把"决定去哪"这一步，交给一个更懂你的搭子</h2>
+          </header>
+
+          <div class="solution-block" data-reveal>
+            <div class="solution-block__stage">
+              <svg class="flow-prototype__clip-defs" width="0" height="0" aria-hidden="true" focusable="false">
+                <defs>
+                  <clipPath id="flow-screen-squircle" clipPathUnits="objectBoundingBox">
+                    <path transform="scale(0.002544529262 0.001172332942)" d="M 76.8 0 H 316.2 C 343.08252 0 356.52378 0 366.79154 5.23169 C 375.82332 9.83361 383.16639 17.17668 387.76831 26.20846 C 393 36.47622 393 49.91748 393 76.8 V 776.2 C 393 803.08252 393 816.52378 387.76831 826.79154 C 383.16639 835.82332 375.82332 843.16639 366.79154 847.76831 C 356.52378 853 343.08252 853 316.2 853 H 76.8 C 49.91748 853 36.47622 853 26.20846 847.76831 C 17.17668 843.16639 9.83361 835.82332 5.23169 826.79154 C 0 816.52378 0 803.08252 0 776.2 V 76.8 C 0 49.91748 0 36.47622 5.23169 26.20846 C 9.83361 17.17668 17.17668 9.83361 26.20846 5.23169 C 36.47622 0 49.91748 0 76.8 0 Z" />
+                  </clipPath>
+                </defs>
+              </svg>
+              <div class="flow-prototype" aria-label="产品流程录屏演示">
+                <video class="solution-block__video is-active" data-flow-video data-highlight-video="1" muted loop playsinline preload="metadata">
+                  <source src="./assets/flow1.mp4" type="video/mp4" />
+                </video>
+                <video class="solution-block__video" data-flow-video data-highlight-video="2" muted loop playsinline preload="metadata">
+                  <source src="./assets/flow2.mp4" type="video/mp4" />
+                </video>
+                <video class="solution-block__video" data-flow-video data-highlight-video="3" muted loop playsinline preload="metadata">
+                  <source src="./assets/flow3.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+            <ol class="solution-list">
+              <li class="is-active" tabindex="0" data-highlight="1">
+                <span>01</span>
+                <div>
+                  <h3>Flow 1 · 体验搜索</h3>
+                  <p>Moodie 直接完成最难的一步——决定去哪，并告诉你这趟旅程大概会有什么体验。三亚海风轻柔、大理洱海环绕，标签一键匹配。</p>
+                </div>
+              </li>
+              <li tabindex="0" data-highlight="2">
+                <span>02</span>
+                <div>
+                  <h3>Flow 2 · Moodie 智能助手</h3>
+                  <p>以轻介入的姿态存在。点位导入体验标签系统后自动切换图标，右下角一键切换"开始规划行程"或"只是看看周边"。</p>
+                </div>
+              </li>
+              <li tabindex="0" data-highlight="3">
+                <span>03</span>
+                <div>
+                  <h3>Flow 3 · 行程规划链路</h3>
+                  <p>一键生成，即刻出发。罗马斗兽场 → 许愿池 → 苹丘观景点，随时随地轻松规划。</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+        </section>
+
+        <section class="section" id="end">
+          <div class="case-end-nav">
+            <span>Moodie · 2025</span>
+            <a href="../mahosojo/index.html">Mahoshojo →</a>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./script.js?v=2"></script>
+  </body>
+</html>

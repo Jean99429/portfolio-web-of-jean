@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Mahoshojo 项目案例：一个用 vibe coding 做出来的启动陪伴 App 原型，以及五个阶段的判断力。" />
+    <title>Mahoshojo — WEB OF JEAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css?v=21" />
+  </head>
+  <body>
+    <nav class="topbar" aria-label="页面导航">
+      <a class="topbar__back" href="../../index.html#work">← Home</a>
+      <div class="topbar__left">
+        <a class="topbar__title" href="../点点3.0/index.html" aria-label="下一个项目：点点 AI 3.0">点点 AI 3.0 →</a>
+      </div>
+    </nav>
+
+    <div class="page-shell">
+      <aside class="case-index" aria-label="项目目录">
+        <p class="case-index__title">Contents</p>
+        <a class="is-active" href="#prd">01&nbsp; PRD</a>
+        <a href="#lofi">02&nbsp; 低保真</a>
+        <a href="#pivot">03&nbsp; 视觉主导权</a>
+        <a href="#expand">04&nbsp; 高保真扩展</a>
+        <a href="#reflect">05&nbsp; 思考</a>
+      </aside>
+
+      <main class="case-main">
+        <header class="hero">
+          <div class="hero__heading">
+            <p class="eyebrow">Vibe coding project</p>
+            <h1>Mahoshojo</h1>
+            <p class="hero__dek">帮执行功能困难的人，把"知道该做什么"变成"真的开始"——一个用 vibe coding 做出来的可试玩原型。</p>
+          </div>
+
+          <dl class="project-meta">
+            <div><dt>项目</dt><dd>Mahoshojo</dd></div>
+            <div><dt>角色</dt><dd>产品设计 · Vibe coding</dd></div>
+            <div><dt>周期</dt><dd>一周</dd></div>
+            <div><dt>状态</dt><dd>持续迭代中</dd></div>
+          </dl>
+
+          <figure class="media media--hero" data-reveal>
+            <div class="hero-stage">
+              <iframe class="hero-frame" src="./assets/hero-loop.html?v=7" title="Mahoshojo 流程循环预览，点击可打开完整可试玩原型" loading="lazy"></iframe>
+            </div>
+            <div class="hero-clickzone" id="heroClickzone"></div>
+          </figure>
+          <div class="hero-cursor-badge" id="heroCursorBadge">Open</div>
+          <div class="hero__links">
+            <span class="hero__note">循环预览 · 点击画面可打开完整可试玩原型</span>
+            <a href="./assets/adhd-start-app-prototype.html" target="_blank" rel="noopener">在新标签页打开 →</a>
+          </div>
+        </header>
+
+        <section class="summary-strip" data-reveal aria-label="使用的 AI 工具与分工">
+          <p><strong>Codex</strong> — 项目产品经理和管理者</p>
+          <p><strong>Claude Code</strong> — 代码实现</p>
+          <p><strong>Claude Design</strong> — 视觉提升和动效设计师</p>
+        </section>
+
+        <div class="opening" data-reveal>
+          <p>我是一个在生活中经常卡在"小事"上的人。</p>
+          <p>出于真实需求，这是一个为 ADHD（注意力缺陷）倾向的人群打造的自动化日程 SOP 应用，帮助解决启动困难的问题，提升日常生活效率。</p>
+        </div>
+
+        <section class="section chapter" id="prd">
+          <header class="chapter-title">
+            <p class="eyebrow">01 · PRD</p>
+            <h2>把直觉收敛成可验证的边界</h2>
+            <p class="chapter-title__intro">PRD 阶段，围绕 ADHD 用户"知道要做什么，却很难开始"的核心困境，逐步明确了产品定位、目标用户与功能边界，并梳理出从首次引导、AI 对话拆解任务，到逐步行动、沉浸陪伴、完成反馈和角色解锁的完整流程。</p>
+          </header>
+
+          <figure class="evidence evidence--compact" data-reveal>
+            <div class="evidence__media">
+              <img src="./assets/01-prd-notion-onboarding-question.png" alt="Notion PRD 评审现场" loading="lazy" />
+            </div>
+            <figcaption>我用 Notion 交互的方式，与 Codex 更高效地进行合作。</figcaption>
+          </figure>
+        </section>
+
+        <section class="section chapter" id="lofi">
+          <header class="chapter-title">
+            <p class="eyebrow">02 · 低保真</p>
+            <h2>锚定不确定点，不是决定视觉</h2>
+            <p class="chapter-title__intro">低保真验证的是体验逻辑，不是视觉——把 PRD 的抽象流程变成可连续点击的体验，用来验证流程顺不顺、操作好不好懂，不是产品定稿。</p>
+          </header>
+
+          <table class="judgment-table" data-reveal>
+            <thead>
+              <tr><th>方向</th><th>想验证的假设</th><th>结论</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>不显示时间相关的组件</td>
+                <td>隐藏计时、自动推进能否降低启动阻力</td>
+                <td>保留"播放器感"，但主流程改为用户主动完成</td>
+              </tr>
+              <tr>
+                <td>一步一确认</td>
+                <td>每步等待确认是否更可靠</td>
+                <td>部分采纳，形成 DONE 按钮，但没做成重型确认页</td>
+              </tr>
+              <tr>
+                <td>减少设备交互</td>
+                <td>触觉提醒能否维持离屏陪伴感</td>
+                <td>保留"沉浸、少看手机"的方向，触觉/后台路线基本放弃</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="evidence-pair" data-reveal>
+            <figure class="evidence">
+              <div class="evidence__media">
+                <img src="./assets/02-lofi-figjam-flow.png" alt="FigJam 用户流程图" loading="lazy" />
+              </div>
+              <figcaption>我自己梳理的完整 FigJam 用户流程图。</figcaption>
+            </figure>
+            <figure class="evidence">
+              <div class="evidence__media">
+                <img src="./assets/02-lofi-prototype2-annotated.png" alt="原型2.0 完整线框与产品标注画布" loading="lazy" />
+              </div>
+              <figcaption>低保真阶段最终收敛成一套覆盖 29 个核心页面／状态的原型 2.0 线框与产品标注，用来把交互逻辑定清楚，再进入视觉。</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section class="section chapter" id="pivot">
+          <header class="chapter-title">
+            <p class="eyebrow">03 · 视觉主导权</p>
+            <h2>什么时候该让 AI 发散，什么时候必须自己定义</h2>
+            <p class="chapter-title__intro">这是全篇第一个转折点——从跟 AI 一起探索方向，到自己接管核心视觉，中间走了三步。</p>
+          </header>
+
+          <div data-reveal>
+            <div class="pivot-case">
+              <span class="pivot-case__label">Step 1</span>
+              <h3>和 Gemini 定 IP，给产品定调</h3>
+              <p>我和 Gemini 反复交互，定出了像素魔法少女的 IP 形象——短身、简单、带点古怪的记忆点，这套形象后来定住了整个产品的调性。</p>
+              <figure class="evidence evidence--compact pivot-case__evidence">
+                <div class="evidence__media">
+                  <img src="./assets/03-gemini-ip-three.png" alt="Gemini 生成的三个像素魔法少女 IP 候选，最终形象已标出" loading="lazy" />
+                </div>
+                <figcaption>Gemini 生成的三个 IP 候选，左边是最终定下的形象。</figcaption>
+              </figure>
+            </div>
+            <div class="pivot-case">
+              <span class="pivot-case__label">Step 2</span>
+              <h3>做视觉 board，找概念和体验都对得上的方向</h3>
+              <p>我做了一版视觉参考 board，把复古播放器、像素角色、蓝紫夜景这些外部参考拼在一起，圈出概念和体验都说得通的最终方向——不是原创画稿，是策展整理的一组参考，用来定方向，不是让 AI 照抄的成品。</p>
+              <figure class="evidence evidence--compact pivot-case__evidence">
+                <div class="evidence__media">
+                  <img src="./assets/03-visual-reference-board.png" alt="视觉参考 Board：复古播放器、飞天小女警、像素角色与蓝紫夜景等外部参考" loading="lazy" />
+                </div>
+                <figcaption>复古播放器、像素角色、蓝紫夜景等外部参考拼成的视觉 board。</figcaption>
+              </figure>
+            </div>
+            <div class="pivot-case">
+              <span class="pivot-case__label">Step 3</span>
+              <h3>语料充足的前提下，AI 仍无法达到高保真预期</h3>
+              <p>我把 IP 形象和视觉 board 一起交给 AI，想看看能不能直接生成体验，结果拿回来的页面结构是对的，但配色和氛围完全跑偏——变成了暖橙色调，丢了我想要的深紫夜景感。于是我自己动手，做了四张核心页面，把真正的视觉语言定下来。</p>
+              <div class="evidence-pair evidence-pair--tight pivot-case__evidence">
+                <figure class="evidence">
+                  <div class="evidence__media">
+                    <img src="./assets/03-ai-attempt-claudedesign.png" alt="AI 生成的路线结果／竖屏行动／完成页，结构对但配色和氛围跑偏" loading="lazy" />
+                  </div>
+                  <figcaption>AI 拿到 IP 和 board 后生成的版本——结构对，但配色和氛围完全跑偏。</figcaption>
+                </figure>
+                <figure class="evidence">
+                  <div class="evidence__media">
+                    <img src="./assets/03-core-masters-final.png" alt="聊天页、任务页、沉浸页等核心高保真母版，深紫夜景像素风" loading="lazy" />
+                  </div>
+                  <figcaption>我自己做的最终版——深紫夜景、像素感，才是真正定下来的视觉语言。</figcaption>
+                </figure>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section chapter" id="expand">
+          <header class="chapter-title">
+            <p class="eyebrow">04 · 高保真扩展</p>
+            <h2>把不同 AI 的输出收敛成同一套产品语言</h2>
+            <p class="chapter-title__intro">核心视觉定好之后，剩下的页面交给 AI 拓展。</p>
+          </header>
+
+          <div data-reveal>
+            <div class="pivot-case">
+              <span class="pivot-case__label">AI 页面拓展</span>
+              <p>对话首页、任务推进、路线库、设置、角色选择这些页面，都交给 AI 按已经定好的视觉语言拓展——每张出来我再对照 Figma 核对一遍，比自己一张张画快很多。</p>
+              <figure class="evidence evidence--compact pivot-case__evidence">
+                <div class="evidence__media">
+                  <img src="./assets/04-figma-final-coverage.png" alt="Figma 核心定稿与最后验证一轮的页面覆盖全景" loading="lazy" />
+                </div>
+                <figcaption>Figma 核心定稿与最后验证一轮的页面覆盖全景。</figcaption>
+              </figure>
+            </div>
+            <div class="pivot-case">
+              <span class="pivot-case__label">Claude Design 实现</span>
+              <div class="claudedesign-row pivot-case__evidence">
+                <p>完成页和 Sage 解锁这两个动效是 Claude Design 做的——像素风格的深色星空、不做评分排名的鼓励文案，是我给的具体要求。完成页点一下 NEXT 能看完整反馈。</p>
+                <div class="claudedesign-frame-group">
+                  <div class="claudedesign-frame-group__stage">
+                    <iframe class="claudedesign-frame" src="./assets/claudedesign-stage-clear.html?v=2" title="Claude Design 生成的 Stage Clear 完成页动画" loading="lazy"></iframe>
+                  </div>
+                  <div class="claudedesign-frame-group__stage">
+                    <iframe class="claudedesign-frame" src="./assets/claudedesign-sage-unlock.html" title="Claude Design 生成的 Sage 解锁动画" loading="lazy"></iframe>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section chapter" id="reflect">
+          <header class="chapter-title">
+            <p class="eyebrow">05 · 思考</p>
+            <h2>不是一次做完整，是先让它跑起来</h2>
+            <p class="chapter-title__intro">这次 vibe coding 最大的体会：不要想着动手前把 PRD、全部页面和 Design System 一次做完整。前期走了不少弯路——花太多时间穷举细节、反复切换 AI，也做出过一些没真正跑起来的设计。后来找到更适合自己的节奏：先定一个小目标，做出能操作的纵向流程，在浏览器里真实体验，再根据问题迭代，把确认过的决定及时记录下来。下一次会更早进入可运行原型，用小闭环推进，同时明确不同 AI 的分工，避免讨论和产出不断膨胀却迟迟看不到真实结果。</p>
+          </header>
+
+          <div class="evidence-pair" data-reveal>
+            <figure class="evidence">
+              <div class="evidence__media">
+                <img src="./assets/06-worklog.png" alt="WORKLOG 项目工作日志现场" loading="lazy" />
+              </div>
+              <figcaption>WORKLOG 工作日志——便于记录和反思。</figcaption>
+            </figure>
+            <figure class="evidence">
+              <div class="evidence__media">
+                <img src="./assets/05-color-unify-before-after.png" alt="Figma AI 统一页面配色的 Before / After 对比" loading="lazy" />
+              </div>
+              <figcaption>Figma AI 统一四个页面配色的 Before / After 对比。</figcaption>
+            </figure>
+          </div>
+
+          <div class="case-end-nav">
+            <span>Mahoshojo · 2026</span>
+            <a href="../点点3.0/index.html">点点 AI 3.0 →</a>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./script.js?v=5"></script>
+  </body>
+</html>

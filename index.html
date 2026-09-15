@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#060606" />
+    <title>Web of Jean</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;800&family=Bitcount+Grid+Double:wght@300&family=Bowlby+One&family=DM+Mono:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400;700&family=Rock+Salt&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.css"
+    />
+    <link rel="stylesheet" href="./styles.css?v=20260912-17" />
+  </head>
+  <body>
+    <div class="site" data-site>
+      <div class="site-cursor" data-site-cursor aria-hidden="true"></div>
+      <div class="site-hand" data-site-hand aria-hidden="true"></div>
+      <div class="site-view-cursor" data-site-view-cursor aria-hidden="true">
+        <span class="site-view-cursor__arrow" data-site-view-arrow>↗</span>
+        <span data-site-view-label>VIEW CASE</span>
+      </div>
+      <section class="intro-sequence" data-intro-sequence id="about">
+        <main class="overture" data-overture>
+          <div class="overture__screen" aria-hidden="true">
+            <video
+              class="overture__video"
+              data-ov="video"
+              src="./首页清晰版.mp4"
+              preload="auto"
+              playsinline
+              loop
+            ></video
+            ><canvas
+              class="overture__video-canvas"
+              data-ov="videoCanvas"
+            ></canvas>
+          </div>
+          <div class="top-nav__glass" aria-hidden="true"></div>
+          <canvas
+            class="overture__canvas"
+            data-ov="canvas"
+            aria-hidden="true"
+          ></canvas>
+          <nav class="top-nav" aria-label="Primary navigation">
+            <a href="#about">Home</a>
+            <span class="top-nav__mark-slot" aria-hidden="true"></span>
+            <a href="#work">Work</a>
+          </nav>
+          <div class="overture__signature" data-ov="ink" aria-hidden="true">
+            <span data-ov="ink-letter">J</span
+            ><span data-ov="ink-letter">E</span
+            ><span data-ov="ink-letter">A</span
+            ><span data-ov="ink-letter">N</span>
+          </div>
+          <button
+            class="overture__mark-hit"
+            data-ov="markHit"
+            type="button"
+            aria-label="Enter the work"
+          ></button>
+          <div class="overture__hud" data-ov="hud">
+            <div class="hud hud--identity">
+              <span>WEB OF JEAN</span><span>V0</span>
+            </div>
+            <nav class="hud hud--nav" aria-label="Primary navigation">
+              <a href="#work">WORK</a><a href="#about">ABOUT</a
+              ><a href="#contact">CONTACT</a>
+            </nav>
+            <div class="hud hud--role">
+              <span>JEAN</span
+              ><span
+                ><i aria-hidden="true">A</i>I PRODUCT &amp; EXPERIENCE
+                DESIGNER</span
+              >
+            </div>
+            <div class="hud hud--enter" data-ov="hudLabel">ENTER THE WORK</div>
+            <div class="hud hud--scroll">SCROLL</div>
+          </div>
+          <div class="intro-copy intro-copy--left" data-intro-left>
+            <h1>
+              <span data-scramble="HI,">HI,</span>
+              <span data-scramble="I AM JEAN">I AM JEAN</span>
+            </h1>
+            <div class="intro-copy__hand" aria-hidden="true">
+              <span>W</span><span>H</span><span>O</span><span>?</span>
+            </div>
+          </div>
+          <div class="intro-copy intro-copy--right" data-intro-right>
+            <p>
+              <span class="intro-copy__lead" data-scramble="AI Product Designer."
+                >AI Product Designer.</span
+              ><br /><span data-scramble="I build complex systems that can adapt to changing details, while staying sensitive to the first-person experience."
+                >I build complex systems that can adapt to changing details, while staying sensitive to the first-person experience.</span
+              >
+            </p>
+          </div>
+          <div class="intro-scroll-hint" data-intro-hint>SCROLL</div>
+          <button class="overture__control" data-ov="skip" type="button">
+            SKIP</button
+          ><button class="overture__control" data-ov="replay" type="button">
+            REPLAY
+          </button>
+          <div class="overture__sound-gate" data-ov="soundGate">
+            CLICK ANYWHERE TO MUTE
+          </div>
+          <div
+            class="overture__cursor"
+            data-ov="cursor"
+            aria-hidden="true"
+          ></div>
+        </main>
+      </section>
+      <section class="projects" id="work" aria-label="Projects">
+        <header class="section-heading">
+          <span>04</span>
+        </header>
+        <div class="project-list">
+          <div class="project-rail-label" data-rail-label aria-hidden="true">
+            PROJECT
+          </div>
+          <div class="project-spacer" data-project-spacer aria-hidden="true"></div>
+          <article class="project" data-project>
+            <div class="project__copy">
+              <h3>Dots AI 3.0</h3>
+              <div class="project__detail">
+                <p>
+                  AI moves beyond generating answers to support how people browse, plan, and ask questions.
+                </p>
+                <div class="project__meta">
+                  <img class="project__avatar" src="./assets/project-avatars/dots-avatar.png" alt="" aria-hidden="true" />
+                  <span>Xiaohongshu Internship<small>2025.08-2026.01</small></span>
+                </div>
+              </div>
+            </div>
+            <a
+              class="project__media"
+              href="./content/点点3.0/index.html"
+              data-generated-media
+              data-cover-src="./assets/home-covers/dots-3-cover.png"
+              data-view-case
+              aria-label="View Dots AI 3.0 case study"
+            ></a>
+          </article>
+          <article class="project" data-project>
+            <div class="project__copy">
+              <h3>Dots AI 2.0</h3>
+              <div class="project__detail">
+                <p>
+                  Redesigning how AI understands and responds to real-life questions across multimodal input and rich-text output.
+                </p>
+                <div class="project__meta">
+                  <img class="project__avatar" src="./assets/project-avatars/dots-avatar.png" alt="" aria-hidden="true" />
+                  <span>Xiaohongshu Internship<small>2025.08-2026.01</small></span>
+                </div>
+              </div>
+            </div>
+            <a
+              class="project__media"
+              href="./content/点点2.0/index.html"
+              data-generated-media
+              data-cover-src="./assets/home-covers/dots-2-cover.png"
+              data-view-case
+              aria-label="View Dots AI 2.0 case study"
+            ></a>
+          </article>
+          <article class="project" data-project>
+            <div class="project__copy">
+              <h3>Moodie</h3>
+              <div class="project__detail">
+                <p>
+                  An intelligent travel-planning experience that shifts from “Where do I want to go?” to “How do I want to feel?”
+                </p>
+                <div class="project__meta">
+                  <img class="project__avatar" src="./assets/project-avatars/moodie-avatar.png" alt="" aria-hidden="true" />
+                  <span>AI Travel Planning<small>2025.07-2025.08</small></span>
+                </div>
+              </div>
+            </div>
+            <a
+              class="project__media"
+              href="./content/moodie/index.html"
+              data-generated-media
+              data-cover-src="./assets/home-covers/moodie-cover.jpg"
+              data-view-case
+              aria-label="View Moodie case study"
+            ></a>
+          </article>
+          <article class="project" data-project>
+            <div class="project__copy">
+              <h3>Mahoshojo</h3>
+              <div class="project__detail">
+                <p>
+                  Helping people with executive-function challenges turn “knowing what to do” into “actually getting started.”
+                </p>
+                <div class="project__meta">
+                  <img class="project__avatar" src="./assets/project-avatars/mahoshojo-avatar.png" alt="" aria-hidden="true" />
+                  <span>Vibe Coding Project<small>2026.02</small></span>
+                </div>
+              </div>
+            </div>
+            <a
+              class="project__media"
+              href="./content/mahosojo/index.html"
+              data-generated-media
+              data-cover-src="./assets/home-covers/mahoshojo-cover.png"
+              data-ascii-monochrome
+              data-view-case
+              aria-label="View Mahoshojo case study"
+            ></a>
+          </article>
+          <div class="project-tail-spacer" data-project-tail-spacer aria-hidden="true"></div>
+        </div>
+      </section>
+<section class="ai-lab" data-ai-lab aria-labelledby="lab-title">
+  <div class="ai-lab__sticky">
+    <div class="ai-lab__copy-rail">
+      <h2 class="ai-lab__a11y-title" id="lab-title">AI LAB</h2>
+      <div class="ai-lab__copy-stack">
+        <div class="lab-item__meta is-lab-copy-active" data-lab-copy data-lab-state="current">
+          <div class="lab-item__identity">
+            <span class="lab-item__section-label" aria-hidden="true">AI LAB</span>
+            <h3>FINGERCONTROL</h3>
+          </div>
+          <p>Hands become the interface: pinch to trigger custom text and sound. MediaPipe, Canvas, and on-device speech power real-time tracking, video compositing, and export in a TouchDesigner-inspired visual language.</p>
+        </div>
+        <div class="lab-item__meta" data-lab-copy data-lab-state="future">
+          <div class="lab-item__identity">
+            <span class="lab-item__section-label" aria-hidden="true">AI LAB</span>
+            <h3>I CHING ORACLE</h3>
+          </div>
+          <p>A personalized AI divination experience rooted in the I Ching, combining traditional hexagram logic with AI interpretation and a cyber-occult visual language.</p>
+        </div>
+      </div>
+    </div>
+    <div class="ai-lab__track" data-lab-track>
+      <article class="lab-item" data-lab-item>
+        <a
+          class="lab-item__media"
+          data-generated-media
+          data-cover-src="./assets/ai-lab/fingercontrol.png?v=20260911-01"
+          href="https://jean99429.github.io/fingercontrol/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-view-case
+          aria-label="打开 Fingercontrol 项目"
+        ></a>
+      </article>
+      <article class="lab-item" data-lab-item>
+        <a
+          class="lab-item__media"
+          data-generated-media
+          data-cover-src="./assets/ai-lab/iching-oracle.png?v=20260911-01"
+          href="https://jean99429.github.io/iching-oracle/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-view-case
+          aria-label="打开 I Ching Oracle 项目"
+        ></a>
+      </article>
+      <article
+        class="lab-item lab-item--teaser"
+        data-lab-item
+        aria-label="Experiment 03 preview"
+      >
+        <span class="lab-item__coming-soon">COMING SOON</span>
+      </article>
+    </div>
+  </div>
+</section>
+      <section class="resume" data-resume aria-label="Double helix">
+        <div class="resume__photos" aria-hidden="true" data-mouse-parallax>
+          <img class="resume__photo" style="--x:3%; --y:2%; --r:-8deg; --w:140px; --blur:1.22px;" src="./assets/resume-photos/photo-1.jpg" alt="" loading="lazy" />
+          <img class="resume__photo" style="--x:15%; --y:16%; --r:5deg; --w:120px; --blur:0.99px;" src="./assets/resume-photos/photo-2.jpg" alt="" loading="lazy" />
+          <img class="resume__photo" style="--x:6%; --y:31%; --r:7deg; --w:150px; --blur:0.68px; aspect-ratio:1/1; object-fit:cover; object-position:center 72%;" src="./assets/resume-photos/photo-3.jpg" alt="" loading="lazy" />
+          <img class="resume__photo" style="--x:19%; --y:45%; --r:-6deg; --w:125px; --blur:0.42px;" src="./assets/resume-photos/photo-4.jpg" alt="" loading="lazy" />
+          <img class="resume__photo" style="--x:2%; --y:59%; --r:4deg; --w:145px; --blur:0.1px;" src="./assets/resume-photos/photo-5.jpg" alt="" loading="lazy" />
+          <img class="resume__photo" style="--x:24%; --y:74%; --r:-9deg; --w:190px; --blur:0px;" src="./assets/resume-photos/photo-6.jpg" alt="" loading="lazy" />
+          <img class="resume__photo" style="--x:4%; --y:88%; --r:3deg; --w:105px; --blur:0px;" src="./assets/resume-photos/photo-7.jpg" alt="" loading="lazy" />
+          <img class="resume__photo" style="--x:96%; --y:5%; --r:8deg; --w:130px; --blur:1.2px;" src="./assets/resume-photos/photo-8.jpg" alt="" loading="lazy" />
+          <img class="resume__photo" style="--x:83%; --y:20%; --r:-5deg; --w:120px; --blur:0.91px;" src="./assets/resume-photos/photo-9.jpg" alt="" loading="lazy" />
+          <img class="resume__photo" style="--x:98%; --y:35%; --r:4deg; --w:135px; --blur:0.57px;" src="./assets/resume-photos/photo-10.jpg" alt="" loading="lazy" />
+          <img class="resume__photo" style="--x:80%; --y:50%; --r:-8deg; --w:185px; --blur:0.26px;" src="./assets/resume-photos/photo-11.jpg" alt="" loading="lazy" />
+          <img class="resume__photo" style="--x:95%; --y:65%; --r:6deg; --w:170px; --blur:0px;" src="./assets/resume-photos/photo-12.jpg" alt="" loading="lazy" />
+          <img class="resume__photo" style="--x:82%; --y:80%; --r:-4deg; --w:115px; --blur:0px;" src="./assets/resume-photos/photo-13.jpg" alt="" loading="lazy" />
+        </div>
+        <div class="resume__frame">
+          <article class="resume__card">
+            <canvas class="resume__helix-canvas" data-helix-canvas></canvas>
+          </article>
+        </div>
+      </section>
+      <footer class="ending" id="contact" data-ending>
+        <div class="ending__stack">
+          <div class="ending__identity">
+            <div class="ending__identity-text">
+              <h2 class="ending__name" data-scramble="Jean">Jean</h2>
+              <p class="ending__tagline">AI WORKFLOWS. CREATIVE IDEAS. HUMAN EXPERIENCES.</p>
+            </div>
+            <div class="ending__mark3d" data-ending-mark3d></div>
+          </div>
+          <div class="ending__closing">
+            <p class="ending__blurb">
+              I’m interested in AI products, interactive experiences, and creative work that brings new possibilities into everyday life. If you’re looking for original experiences, thoughtful AI products, or effective AI workflows, let’s talk.
+            </p>
+            <a class="ending__mail" href="mailto:janezheng1995@icloud.com">
+              <span class="ending__mail-row">
+                <span class="ending__mail-label">MAIL ME</span>
+                <span class="ending__mail-arrow">→</span>
+              </span>
+              <svg
+                class="ending__mail-line"
+                viewBox="0 0 220 6"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M0,3.4 C20,1.6 40,4.8 60,2.4 C80,4.2 100,1.4 120,3.6 C140,5 160,2 180,3.8 C195,2.2 210,4.4 220,2.8"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <p class="ending__year">2026</p>
+      </footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+    <script src="./smooth-scroll.js?v=20260912-01"></script>
+    <script type="module" src="./overture.js?v=20260911-09"></script>
+    <script type="module" src="./continuation.js?v=20260912-02"></script>
+    <script type="module" src="./resume-helix.js?v=20260911-01"></script>
+    <script type="module" src="./resume-theme.js?v=20260911-01"></script>
+    <script type="module">
+      const layer = document.querySelector("[data-mouse-parallax]");
+      if (layer && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        let targetX = 0;
+        let targetY = 0;
+        let curX = 0;
+        let curY = 0;
+        let running = false;
+
+        function onMouseMove(e) {
+          const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+          const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+          targetX = nx * 26;
+          targetY = ny * 16;
+          if (!running) {
+            running = true;
+            requestAnimationFrame(tick);
+          }
+        }
+
+        function tick() {
+          curX += (targetX - curX) * 0.07;
+          curY += (targetY - curY) * 0.07;
+          layer.style.setProperty("--mx", curX.toFixed(2) + "px");
+          layer.style.setProperty("--my", curY.toFixed(2) + "px");
+          if (Math.abs(targetX - curX) > 0.05 || Math.abs(targetY - curY) > 0.05) {
+            requestAnimationFrame(tick);
+          } else {
+            running = false;
+          }
+        }
+
+        window.addEventListener("mousemove", onMouseMove, { passive: true });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="点点 AI 3.0 项目案例：地图路线与真实 AI 产品体验设计。" />
+    <title>点点 AI 3.0 — WEB OF JEAN</title>
+    <link rel="stylesheet" href="./styles.css?v=44" />
+    <script src="./motion/support.js"></script>
+  </head>
+  <body>
+    <nav class="topbar" aria-label="页面导航">
+      <a class="topbar__back" href="../../index.html#work">← Home</a>
+      <a class="topbar__title" href="../点点2.0/index.html" aria-label="下一个项目：点点 AI 2.0">点点 AI 2.0 →</a>
+    </nav>
+
+    <div class="page-shell">
+      <aside class="case-index" aria-label="项目目录">
+        <p class="case-index__title">Contents</p>
+        <a class="is-active" href="#overview">01&nbsp; 项目与转型</a>
+        <a href="#problem">02&nbsp; 用户困境</a>
+        <a href="#solution">03&nbsp; 设计方案</a>
+        <a href="#result">04&nbsp; 最终效果</a>
+        <a href="#other-work">05&nbsp; 其他参与</a>
+      </aside>
+
+      <main class="case-main">
+        <header class="hero">
+          <div class="hero__heading">
+            <p class="eyebrow">Case study · 2025</p>
+            <h1>点点 AI 3.0</h1>
+            <p class="hero__dek">让 AI 不只生成答案，而是进入用户浏览、规划和提问的真实路径。</p>
+          </div>
+
+          <dl class="project-meta">
+            <div><dt>项目</dt><dd>小红书 · 点点 AI</dd></div>
+            <div><dt>角色</dt><dd>体验设计实习生</dd></div>
+            <div><dt>周期</dt><dd>2025.08—2025.12</dd></div>
+            <div><dt>状态</dt><dd>需求均已正式上线</dd></div>
+          </dl>
+
+          <figure class="media media--hero media--hero-motion" data-reveal>
+  <x-dc>
+    <helmet>
+      <script>window.OM_SCENES = '[{\"name\":\"Opening\",\"dur\":2.6},{\"name\":\"Prompts\",\"dur\":3.8},{\"name\":\"Ask\",\"dur\":1.6},{\"name\":\"Cards\",\"dur\":3.6},{\"name\":\"Parse\",\"dur\":3.4},{\"name\":\"Summary\",\"dur\":4.4}]'; window.OM_PLAYBACK='{\"mode\":\"loop\"}'; window.TWEAK_DEFAULTS={motionEditor:false,drift:1,bg:'#eef1f0',glow:'rgba(49,182,157,0.18)'};</script>
+    </helmet>
+    <x-import component-from-global-scope="DianStage" from="./motion/animations-v3.jsx ./motion/tweaks-panel.jsx ./motion/scene.jsx" hint-size="100%,100%"></x-import>
+  </x-dc>
+</figure>
+        </header>
+
+        <section class="section overview section--overview" id="overview">
+          <div class="section-head">
+            <p class="eyebrow">01 · 项目与转型</p>
+            <h2>从「懂你」到「陪你逛」——关于定位的重新出发</h2>
+          </div>
+
+          <div class="two-column-copy">
+            <div>
+              <h3>About</h3>
+              <p>点点是一款基于小红书 UGC 生态的 AI 工具。它利用平台上的真实生活经验和内容数据，在旅行、消费与日常决策等场景中提供回答。</p>
+            </div>
+            <div>
+              <h3>My role</h3>
+              <p>我在小红书 UED 团队参与点点 3.0 迭代，独立负责作品中呈现的需求，从问题定义、交互方案到视觉与开发联调，最终均正式上线。</p>
+            </div>
+          </div>
+
+
+<div class="positioning-block">
+  <div class="phone-compare" data-state="old" data-reveal>
+    <div class="phone-compare__copy">
+      <p class="caption">Positioning shift</p>
+      <h3>从泛化陪伴，走向明确的使用场景。</h3>
+      <div class="segmented-control" role="tablist" aria-label="切换点点产品定位">
+        <button class="is-active" type="button" data-state="old" role="tab" aria-selected="true">早期 · 懂你的 AI 助手</button>
+        <button type="button" data-state="new" role="tab" aria-selected="false">3.0 · 陪你逛小红书</button>
+      </div>
+      <div class="phone-compare__notes" aria-live="polite">
+        <p class="phone-compare__note is-active" data-note="old">早期希望通过小红书内容理解用户偏好，成为一个“懂你的 AI 助手”。但定位过于泛化，既不像工具那样明确，也缺少持续使用的具体理由。</p>
+        <p class="phone-compare__note" data-note="new">3.0 不再试图解决一切问题，而是进入浏览、搜索、复制链接和行程规划等具体场景，成为“陪你逛小红书的 AI 助手”。</p>
+      </div>
+    </div>
+    <div class="phone-compare__stage">
+      <img class="phone-compare__image is-active" data-image="old" src="./assets/position-old.png" alt="早期点点首页" />
+      <img class="phone-compare__image" data-image="new" src="./assets/position-new.png" alt="点点 3.0 首页" />
+    </div>
+  </div>
+</div>
+        </section>
+
+        <section class="section chapter" id="problem">
+          <header class="chapter-title">
+            <p class="eyebrow">02 · 用户困境</p>
+            <h2>小红书已经成为行程攻略不可替代的一环——但用起来还是很麻烦</h2>
+            <p class="chapter-title__intro">这是一个从设计观察出发的需求。我希望把 AI 已经完成的内容筛选和行程规划，转化为用户能直接看懂并使用的空间信息。</p>
+          </header>
+
+          <div class="quote-cloud" data-reveal aria-label="用户关于行程规划的真实困扰">
+            <blockquote>“收藏了一堆，但要我现在排路线，还是得重新整理。”</blockquote>
+            <blockquote>“出来旅游打开小红书再打开 xx 地图一万次……”</blockquote>
+            <blockquote>“我只是想大概预览一下有哪些地方得去！”</blockquote>
+          </div>
+
+          <div class="logic-grid" data-reveal>
+            <article>
+              <p class="caption">Current</p>
+              <h3>现状</h3>
+              <ul>
+                <li>行程信息以图文形式呈现</li>
+                <li>回答以长篇富文本为主</li>
+                <li>实际上已经完成内容筛选和规划</li>
+              </ul>
+            </article>
+            <article>
+              <p class="caption">Gap</p>
+              <h3>问题</h3>
+              <ul>
+                <li>信息传达效率低下，用户难以理解</li>
+                <li>富文本回答繁琐，无法预览信息</li>
+                <li>无法直接实际应用</li>
+              </ul>
+            </article>
+            <article>
+              <p class="caption">Opportunity</p>
+              <h3>机会点</h3>
+              <ul>
+                <li>文本理解转化为空间化感知</li>
+                <li>利用富文本已有结构，加入可视化表达</li>
+                <li>完成行程规划的链路闭环</li>
+              </ul>
+            </article>
+          </div>
+
+        </section>
+
+        <section class="section chapter" id="solution">
+          <header class="chapter-title">
+            <p class="eyebrow">03 · 设计方案</p>
+            <h2>路线预览、Tab 分层、结构化回答——三个具体的落地点</h2>
+          </header>
+
+          <div class="narrative-row">
+            <div class="narrative-row__copy">
+              <p class="caption">Design thinking</p>
+              <h3>先确定能力，再寻找它在回答里的合适形态。</h3>
+              <p>地图需要提供预览、空间感知和决策辅助，也要保持对话的连贯性。我比较了富文本内嵌、独立气泡，以及 Tab、表格和结构化文本等组织方式。</p>
+              <p>关键并不是“加入一张地图”，而是控制地图与回答的关系：什么时候看总览、什么时候进入细节、哪些内容需要继续留在文字中。</p>
+            </div>
+            <figure class="media media--board" data-reveal>
+              <img src="./assets/map-design-thinking-v3.png" alt="地图能力、富文本形态与信息组织方式的设计思考" loading="lazy" />
+            </figure>
+          </div>
+
+          <ol class="design-principles" data-reveal>
+            <li>
+              <span>01</span>
+              <div>
+                <h3>清晰的路线预览，快速建立行程的空间认知</h3>
+                <p>地图路线将点位关系、移动方向和整体结构提前呈现，让用户在阅读细节前形成整体印象。</p>
+              </div>
+            </li>
+            <li>
+              <span>02</span>
+              <div>
+                <h3>通过 Tab 分层组织回答，优化可读性与定位效率</h3>
+                <p>按日期或路线切换内容，减少一次展开全部信息的阅读压力，也方便回到特定行程。</p>
+              </div>
+            </li>
+            <li>
+              <span>03</span>
+              <div>
+                <h3>地图容器作为富文本回答一部分，保持连贯的对话与决策体验</h3>
+                <p>地图与文字处于同一上下文中，用户无需反复跳转，就能理解路线与说明之间的关系。</p>
+              </div>
+            </li>
+          </ol>
+
+          <div class="handoff-block" data-reveal>
+            <div class="handoff-block__copy">
+              <p class="caption">Design handoff</p>
+              <h3>把复杂样式整理成研发可以直接理解的规则。</h3>
+              <p>为减少开发对接中的理解偏差，我将地图的配色、地点图标与标签状态整理为表格化交付规范。</p>
+            </div>
+            <figure class="media handoff-block__media">
+              <img src="./assets/map-handoff-spec.png" alt="地图配色、地点图标与标签状态的研发交付规范" loading="lazy" />
+            </figure>
+          </div>
+        </section>
+
+        <section class="section chapter section--result" id="result">
+          <header class="chapter-title">
+            <p class="eyebrow">04 · 最终效果</p>
+            <h2>回答不再只是文字，是一份能直接用的行程</h2>
+          </header>
+
+          <div class="solution-block">
+            <div class="solution-block__stage" data-reveal>
+              <svg class="map-prototype__clip-defs" width="0" height="0" aria-hidden="true" focusable="false">
+                <defs>
+                  <clipPath id="map-screen-squircle" clipPathUnits="objectBoundingBox">
+                    <path transform="scale(0.002544529262 0.001172332942)" d="M 76.8 0 H 316.2 C 343.08252 0 356.52378 0 366.79154 5.23169 C 375.82332 9.83361 383.16639 17.17668 387.76831 26.20846 C 393 36.47622 393 49.91748 393 76.8 V 776.2 C 393 803.08252 393 816.52378 387.76831 826.79154 C 383.16639 835.82332 375.82332 843.16639 366.79154 847.76831 C 356.52378 853 343.08252 853 316.2 853 H 76.8 C 49.91748 853 36.47622 853 26.20846 847.76831 C 17.17668 843.16639 9.83361 835.82332 5.23169 826.79154 C 0 816.52378 0 803.08252 0 776.2 V 76.8 C 0 49.91748 0 36.47622 5.23169 26.20846 C 9.83361 17.17668 17.17668 9.83361 26.20846 5.23169 C 36.47622 0 49.91748 0 76.8 0 Z" />
+                  </clipPath>
+                </defs>
+              </svg>
+              <div class="map-prototype" data-map-prototype aria-label="地图路线交互演示">
+                <div class="map-prototype__state map-prototype__state--video" data-prototype-state="route">
+                  <video muted playsinline loop preload="metadata" poster="./assets/map-prototype-detail.png" aria-label="路线预览录屏">
+                    <source src="./assets/map-demo-route-final.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div class="map-prototype__state map-prototype__state--video" data-prototype-state="tabs">
+                  <video muted playsinline loop preload="metadata" poster="./assets/map-prototype-tab.png" aria-label="日期 Tab 切换录屏">
+                    <source src="./assets/map-demo-tabs-final.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div class="map-prototype__state map-prototype__state--video" data-prototype-state="structure">
+                  <video muted playsinline loop preload="metadata" poster="./assets/map-prototype-overview.png" aria-label="结构化细节下滑录屏">
+                    <source src="./assets/map-demo-structure-final.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+            </div>
+            <ol class="solution-list">
+              <li tabindex="0" data-highlight="route"><span>01</span><div><h3>路线预览</h3><p>查看点位关系、移动方向和整段行程。</p></div></li>
+              <li tabindex="0" data-highlight="tabs"><span>02</span><div><h3>Tab 分层</h3><p>按日期快速定位对应的路线与内容。</p></div></li>
+              <li tabindex="0" data-highlight="structure"><span>03</span><div><h3>结构化回答</h3><p>边看边用地点、时间、图片与行动信息。</p></div></li>
+            </ol>
+          </div>
+
+        </section>
+
+        <section class="section" id="other-work">
+          <div class="section-head section-head--compact">
+            <p class="eyebrow">05 · 其他参与</p>
+            <h2>围绕同一个产品，持续补齐细节。</h2>
+            <p class="section-head__intro">
+              除了地图路线，我也独立负责并上线了链接识别、Loading 动画、分享链路和常驻入口。点击项目可查看对应设计画面。
+            </p>
+          </div>
+
+          <div class="other-explorer">
+            <div class="contribution-list contribution-list--interactive" role="tablist" aria-label="其他参与项目">
+              <button class="is-active" type="button" role="tab" aria-selected="true" data-other-target="link">
+                <span>01</span>
+                <div>
+                  <h3>链接识别</h3>
+                  <p>补齐站外复制链接后的提问路径，完成方案比较、解析状态与边界处理。</p>
+                </div>
+                <b aria-hidden="true">+</b>
+              </button>
+              <button type="button" role="tab" aria-selected="false" data-other-target="loading">
+                <span>02</span>
+                <div>
+                  <h3>Loading 状态</h3>
+                  <p>完成 AE 动画、ProtoPie 打样、Lottie 交付与联调，让等待过程有反馈且可预期。</p>
+                </div>
+                <b aria-hidden="true">+</b>
+              </button>
+              <button type="button" role="tab" aria-selected="false" data-other-target="share">
+                <span>03</span>
+                <div>
+                  <h3>分享链路</h3>
+                  <p>收束分散的分享入口，让一段有价值的对话可以被完整、快速地分享。</p>
+                </div>
+                <b aria-hidden="true">+</b>
+              </button>
+              <button type="button" role="tab" aria-selected="false" data-other-target="entry">
+                <span>04</span>
+                <div>
+                  <h3>常驻入口</h3>
+                  <p>在内容浏览和搜索路径中设置轻量入口，让点点在合适的时机参与用户行为。</p>
+                </div>
+                <b aria-hidden="true">+</b>
+              </button>
+            </div>
+
+            <div class="other-preview" aria-live="polite">
+              <div class="other-preview__topline" data-other-next-trigger role="button" tabindex="0" aria-label="切换下一个项目">
+                <p data-other-title>Loading 状态</p>
+                <span>Next →</span>
+              </div>
+
+              <div class="other-preview__viewport">
+                <div class="other-preview__panel is-active" data-other-panel="link">
+                  <img class="is-active" src="./assets/other-link.png" alt="链接识别设计概览" />
+                  <img src="./assets/link-options.png" alt="链接识别方案比较" loading="lazy" />
+                  <img src="./assets/link-edge-cases.png" alt="链接识别边界状态" loading="lazy" />
+                </div>
+                <div class="other-preview__panel other-preview__panel--pan" data-other-panel="loading">
+                  <img src="./assets/other-loading.png" alt="Loading 状态动画设计与交付流程" loading="lazy" />
+                </div>
+                <div class="other-preview__panel other-preview__panel--pan" data-other-panel="share">
+                  <img src="./assets/other-share.png" alt="分享链路设计" loading="lazy" />
+                </div>
+                <div class="other-preview__panel other-preview__panel--pan" data-other-panel="entry">
+                  <img src="./assets/other-entry.png" alt="点点常驻入口设计" loading="lazy" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="case-end-nav">
+            <span>点点 AI 3.0 · 2025</span>
+            <a href="../点点2.0/index.html">点点 AI 2.0 →</a>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <script src="./script.js?v=21"></script>
+  </body>
+</html>
