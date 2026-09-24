@@ -5,7 +5,8 @@ body{display:flex;align-items:flex-start;justify-content:center;background:#1717
 #device{width:402px!important;height:var(--mobile-height)!important;transform:scale(var(--mobile-scale))!important;transform-origin:top left}
 #phone{left:0!important;top:0!important;width:402px;height:var(--mobile-height)!important;border-radius:0!important;box-shadow:none!important}
 .bezel{display:none!important}
-#app,.feed,.pub-screen,.group-chat{height:var(--mobile-height)!important}
+#app{position:absolute;top:-54px;height:calc(var(--mobile-height) + 54px)!important}
+.feed,.pub-screen,.group-chat{height:calc(var(--mobile-height) + 54px)!important}
 .feed-image{height:100%;object-fit:cover;object-position:center}
 .splash-art{height:100%;object-fit:cover}
 .intro-modal,.join-modal{top:auto!important;bottom:16px!important;max-height:calc(var(--mobile-height) - 28px);overflow-y:auto;scrollbar-width:none}
@@ -21,3 +22,19 @@ body{display:flex;align-items:flex-start;justify-content:center;background:#1717
 .pub-screen:has(> .pub-screenshot){overflow-y:auto}
 .pub-screen:has(> .pub-screenshot)::after{content:'';display:block;height:874px;pointer-events:none}
 .gc-body{bottom:94px;overflow-y:auto;padding-bottom:32px}
+
+/* Browser chrome is outside the viewport; remove only the simulated status strip. */
+#splash{top:-54px}.splash-status{display:none}
+.pub-compose{overflow:hidden!important}
+.mobile-compose-scroll{position:absolute;inset:54px 0 90px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.mobile-compose-content{position:relative;height:720px;margin-top:-54px}
+.mobile-compose-content .pub-screenshot{clip-path:inset(0 0 100px 0)}
+.mobile-compose-footer{position:absolute;bottom:0;left:0;width:402px;height:90px;overflow:hidden;background:white;z-index:4}
+.mobile-compose-footer img{position:absolute;width:402px;height:874px;top:-774px;left:0;max-width:none}
+.mobile-compose-footer .pub-compose-post{top:12px}
+.mobile-feed-top,.mobile-feed-bottom{position:absolute;left:0;width:402px;overflow:hidden;pointer-events:none}
+.mobile-feed-top{top:0;height:106px}.mobile-feed-bottom{bottom:0;height:86px}
+.mobile-feed-top img,.mobile-feed-bottom img{position:absolute;width:402px;height:874px;max-width:none;object-fit:fill}
+.mobile-feed-top img{top:0}.mobile-feed-bottom img{bottom:0}
+.feed-info{z-index:1}
+.pub-home,.pmd-home{display:none}
