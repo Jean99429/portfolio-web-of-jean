@@ -1,12 +1,12 @@
 {
   "139-11899": {
-    "imgImage1": "assets/139-11899-imgImage1.png",
+    "imgImage1": "assets/139-11899-imgImage1.webp",
     "imgFrame42": "assets/139-11899-imgFrame42.svg",
     "imgFrame37": "assets/139-11899-imgFrame37.svg",
     "imgMusic": "assets/139-11899-imgMusic.svg"
   },
   "139-12440": {
-    "imgRectangle": "assets/139-12440-imgRectangle.png",
+    "imgRectangle": "assets/139-12440-imgRectangle.webp",
     "imgEllipse": "assets/139-12440-imgEllipse.png",
     "imgEllipse1": "assets/139-12440-imgEllipse1.png",
     "imgEllipse2": "assets/139-12440-imgEllipse2.png",
@@ -22,7 +22,7 @@
     "imgVector4": "assets/139-12440-imgVector4.svg"
   },
   "139-11943": {
-    "imgLocked": "assets/139-11943-imgLocked.png",
+    "imgLocked": "assets/139-11943-imgLocked.webp",
     "imgVector": "assets/139-11943-imgVector.png",
     "imgVector1": "assets/139-11943-imgVector1.png",
     "imgVector2": "assets/139-11943-imgVector2.png",

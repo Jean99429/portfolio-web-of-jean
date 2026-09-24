@@ -1,9 +1,9 @@
 const PUB_IMAGE = {
-  compose: 'assets/publisher-139-12210.png',
-  'add-link': 'assets/publisher-139-12227.png',
-  'attached-compose': 'assets/publisher-139-12258.png',
+  compose: 'assets/publisher-139-12210.webp',
+  'add-link': 'assets/publisher-139-12227.webp',
+  'attached-compose': 'assets/publisher-139-12258.webp',
   'hosting-empty': 'assets/publisher-139-12292.png',
-  'discover-list': 'assets/publisher-139-12339.png',
+  'discover-list': 'assets/publisher-139-12339.webp',
   'new-meetup': 'assets/publisher-139-12044.png',
 };
 
@@ -17,7 +17,7 @@ function filledForm(state = {}) {
   state.fillAnim = false;
   return `<div class="pub-screen pub-form is-filled${entering ? ' is-entering' : ''}">
     <div class="pmd-scroll" onscroll="this.parentNode.style.setProperty('--pmd-top', Math.min(1, this.scrollTop / 40))"><div class="pmd-inner">
-      <img class="pmd-bg" src="assets/filled/bg.png" alt="">
+      <img class="pmd-bg" src="assets/filled/bg.webp" alt="">
       <main class="pnm-body">
         <div class="pnm-top">
           <div class="pnm-name-block">
@@ -51,7 +51,7 @@ function formContent(state, assets) {
   if (state.prefilled) return filledForm(state);
   const v = (value, placeholder) => placeholder;
   return `<div class="pub-screen pub-form is-dark">
-    <img class="pnm-bg" src="assets/form/bg-161-latest.png" alt="">
+    <img class="pnm-bg" src="assets/form/bg-161-latest.webp" alt="">
     <div class="pnm-status"><span class="pnm-time">9:41</span><img class="pnm-cell" src="assets/filled/cellular.svg" alt=""><img class="pnm-wifi" src="assets/filled/wifi.svg" alt=""><span class="pnm-batt"></span><span class="pnm-batt-fill"></span><img class="pnm-cap" src="assets/filled/cap.svg" alt=""></div>
     <img class="pnm-back-20" src="assets/filled/back-20.svg" alt="">
     <button type="button" class="pnm-back" data-action="publisher-back" aria-label="Back to meetups"><img src="assets/filled/back-26.svg" alt=""></button>

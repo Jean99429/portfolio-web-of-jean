@@ -16,7 +16,7 @@
 .pub-picker button{font-family:inherit;cursor:pointer}
 .pub-meetup-list{position:absolute;top:145px;left:0;width:402px;height:628px;overflow-y:auto;padding:15px 20px 0;box-sizing:border-box;background:#fff}
 .pub-meetup-row{width:362px;height:108px;display:flex;align-items:center;gap:14px;border:0;background:#fff;text-align:left;padding:0;color:#161823}
-.pub-meetup-photo{width:76px;height:86px;flex:none;border-radius:9px;background-image:url('assets/publisher-139-12339.png');background-size:402px 874px;background-repeat:no-repeat}
+.pub-meetup-photo{width:76px;height:86px;flex:none;border-radius:9px;background-image:url('assets/publisher-139-12339.webp');background-size:402px 874px;background-repeat:no-repeat}
 .pub-photo-0{background-position:-20px -169px}.pub-photo-1{background-position:-20px -277px}.pub-photo-2{background-position:-20px -385px}.pub-photo-3{background-position:-20px -493px}.pub-photo-4{background-position:-20px -601px}.pub-photo-5{background-position:-20px -709px}
 .pub-meetup-info{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}.pub-meetup-info strong{font-size:16px;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pub-meetup-info small{font-size:12px;color:#60616a;line-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pub-radio{width:20px;height:20px;flex:none;border:1.5px solid #c8cbd2;border-radius:50%;box-sizing:border-box}.pub-radio.pub-checked{background:#fe2c55;border-color:#fe2c55}.pub-radio.pub-checked:after{content:'✓';display:block;text-align:center;line-height:17px;color:#fff;font-size:14px;font-weight:bold}
@@ -162,7 +162,7 @@
 .pmd-footblur i:nth-child(4){-webkit-mask-image:linear-gradient(0deg,#000 0%,#000 15%,transparent 45%);mask-image:linear-gradient(0deg,#000 0%,#000 15%,transparent 45%)}
 /* Blank → filled "auto-fill" transition (only when tapping a field on the blank form) */
 .pmd-wash{display:none}
-.pub-form.is-entering .pmd-wash{display:block;position:absolute;inset:0;background:#000 url(assets/form/bg-gradient.png) 0 0/402px 1017px no-repeat;pointer-events:none;animation:pmd-wash .5s var(--ease-fade) both}
+.pub-form.is-entering .pmd-wash{display:block;position:absolute;inset:0;background:#000 url(assets/form/bg-gradient.webp) 0 0/402px 1017px no-repeat;pointer-events:none;animation:pmd-wash .5s var(--ease-fade) both}
 .pub-form.is-entering .pmd-bg{animation:pmd-bg-in .7s var(--ease-enter) both}
 .pub-form.is-entering .pmd-name,.pub-form.is-entering .pnm-hosting-row,.pub-form.is-entering .pnm-field,.pub-form.is-entering .pnm-divider,.pub-form.is-entering .pnm-guest,.pub-form.is-entering .pnm-album,.pub-form.is-entering .pnm-about{animation:pmd-fill-in .45s var(--ease-enter) both}
 .pub-form.is-entering .pmd-name{animation-delay:.15s}

@@ -17,7 +17,7 @@ const avatarStack=()=>`<div class="avatar-stack">${avatars.map(a=>img(a)).join('
 function feed(){return `<section class="feed">${img(assets.feed,'feed-image','Argentina football fans celebrating')}<div class="feed-info">${action('details',`<img class="meetup-icon" src="assets/feed/meetup-icon-full.svg" alt=""><span class="feed-card-text"><span class="feed-card-title"><span>Meetup</span><span class="feed-divider"></span><span>Argentina Watch Party</span></span><small>${count()}/50 going</small></span>`,'feed-card')}<strong>tom</strong><p>You're invited! Watch the match with fellow Argentina fans 🇦🇷 Come sing with us!</p><div class="music"><img src="assets/feed/music.svg" alt=""><span>Song name - song artist</span></div></div><button class="inbox-hotspot" data-action="chat" aria-label="Open meetup chat"></button>${state.posted?'<div class="posted-toast" role="status">Your post is live</div>':''}</section>`;}
 function details(){const photos=state.photos;return `<section class="pub-screen pub-form is-filled pmd-details">
 <div class="pmd-scroll" onscroll="this.parentNode.style.setProperty('--pmd-top', Math.min(1, this.scrollTop / 40))"><div class="pmd-inner">
-<img class="pmd-bg" src="assets/filled/bg.png" alt="">
+<img class="pmd-bg" src="assets/filled/bg.webp" alt="">
 <main class="pnm-body">
 <div class="pnm-top"><div class="pnm-name-block"><h1 class="pmd-name">Argentina<br>Watch Party</h1><div class="pnm-hosting-row"><span class="pnm-hosting pmd-tag"><span class="pmd-tag-icon"><img src="assets/filled/soccer.svg" alt=""></span><span>Worldcup</span></span></div></div>
 <div class="pnm-time-place"><div class="pnm-field pnm-field-time"><span class="pnm-label">TIME</span><span class="pnm-value">Sat, Jul 11</span><span class="pmd-sub">11:30 PM</span></div><div class="pnm-field pnm-field-place"><span class="pnm-label">PLACE</span><span class="pnm-value">The Football Factory</span><span class="pmd-dist"><span class="pmd-sub">2.8 km away</span><img src="assets/filled/arrow-up-right.svg" alt=""></span></div></div></div>
@@ -98,7 +98,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal){closeModal()
 function resize(){const phone=innerWidth<=500,w=phone?402:450,h=phone?874:920,scale=phone?Math.min(innerWidth/402,innerHeight/874):Math.min(innerWidth*.9/450,innerHeight*.82/920,1);document.documentElement.style.setProperty('--scale',scale);const s=document.querySelector('#stage');s.style.width=w*scale+'px';s.style.height=h*scale+'px';}
 addEventListener('resize',resize);resize();render();
 // Decode heavy publish-flow images up front so screen transitions don't stall
-const decoded=['assets/addlink-sheet.png','assets/publisher-139-12210.png','assets/publisher-139-12258.png','assets/publisher-139-12339.png','assets/publisher-139-12292.png','assets/publisher-139-12044.png','assets/filled/bg.png','assets/form/bg-gradient.png'].map(src=>{const im=new Image();im.src=src;im.decode?.().catch(()=>{});return im;});
+const laterImages=['assets/addlink-sheet.png','assets/publisher-139-12210.webp','assets/publisher-139-12258.webp','assets/publisher-139-12339.webp','assets/publisher-139-12292.png','assets/publisher-139-12044.png','assets/filled/bg.webp','assets/form/bg-gradient.webp'];
+setTimeout(async()=>{for(const src of laterImages){const im=new Image();im.decoding='async';im.fetchPriority='low';im.src=src;try{await im.decode()}catch{}}},4200);
 // Splash → feed → new-feature popup
 const splash=document.querySelector('#splash');
 setTimeout(()=>{splash.classList.add('hide');setTimeout(()=>splash.remove(),700);},1400);
