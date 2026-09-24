@@ -1,0 +1,40 @@
+{
+  "139-11899": {
+    "imgImage1": "assets/139-11899-imgImage1.png",
+    "imgFrame42": "assets/139-11899-imgFrame42.svg",
+    "imgFrame37": "assets/139-11899-imgFrame37.svg",
+    "imgMusic": "assets/139-11899-imgMusic.svg"
+  },
+  "139-12440": {
+    "imgRectangle": "assets/139-12440-imgRectangle.png",
+    "imgEllipse": "assets/139-12440-imgEllipse.png",
+    "imgEllipse1": "assets/139-12440-imgEllipse1.png",
+    "imgEllipse2": "assets/139-12440-imgEllipse2.png",
+    "imgFrame77": "assets/139-12440-imgFrame77.svg",
+    "imgVector": "assets/139-12440-imgVector.svg",
+    "img": "assets/139-12440-img.svg",
+    "imgIconArtJam": "assets/139-12440-imgIconArtJam.svg",
+    "imgVector1": "assets/139-12440-imgVector1.svg",
+    "img1": "assets/139-12440-img1.svg",
+    "imgFire": "assets/139-12440-imgFire.svg",
+    "imgVector2": "assets/139-12440-imgVector2.svg",
+    "imgVector3": "assets/139-12440-imgVector3.svg",
+    "imgVector4": "assets/139-12440-imgVector4.svg"
+  },
+  "139-11943": {
+    "imgLocked": "assets/139-11943-imgLocked.png",
+    "imgVector": "assets/139-11943-imgVector.png",
+    "imgVector1": "assets/139-11943-imgVector1.png",
+    "imgVector2": "assets/139-11943-imgVector2.png",
+    "imgBackIcon": "assets/139-11943-imgBackIcon.svg",
+    "img": "assets/139-11943-img.svg",
+    "imgArrowUpRight1": "assets/139-11943-imgArrowUpRight1.svg",
+    "imgImagePlaceholder": "assets/139-11943-imgImagePlaceholder.svg",
+    "imgImagePlaceholder1": "assets/139-11943-imgImagePlaceholder1.svg",
+    "imgCap": "assets/139-11943-imgCap.svg",
+    "imgWifi": "assets/139-11943-imgWifi.svg",
+    "imgCellularConnection": "assets/139-11943-imgCellularConnection.svg",
+    "imgBackIcon1": "assets/139-11943-imgBackIcon1.svg",
+    "imgArrowshapeTurnUpRight1": "assets/139-11943-imgArrowshapeTurnUpRight1.svg"
+  }
+}

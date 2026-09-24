@@ -1,0 +1,197 @@
+.join-animation {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 184px;
+  overflow: hidden;
+  place-items: center;
+  isolation: isolate;
+  color: #fff;
+  background: #212121;
+  border-radius: 14px;
+}
+
+.join-animation__glow {
+  position: absolute;
+  z-index: -1;
+  top: 20px;
+  left: 50%;
+  width: 220px;
+  height: 130px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, rgb(91 176 210 / 18%), transparent 68%);
+  animation: join-glow-in 700ms ease-out both;
+}
+
+.join-animation__scene {
+  position: absolute;
+  inset: 0;
+}
+
+.join-animation__arrivals,
+.join-animation__group {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  width: 220px;
+  height: 70px;
+  transform: translateX(-50%);
+}
+
+.join-animation__person,
+.join-animation__you {
+  position: absolute;
+  top: 7px;
+  display: grid;
+  width: 52px;
+  height: 52px;
+  overflow: hidden;
+  place-items: center;
+  border: 3px solid #212121;
+  border-radius: 50%;
+  background: #333;
+  box-shadow: 0 3px 12px rgb(0 0 0 / 28%);
+}
+
+.join-animation__person img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.join-animation__person--1 { left: 53px; z-index: 2; }
+.join-animation__person--2 { left: 84px; z-index: 3; }
+.join-animation__person--3 { left: 115px; z-index: 2; }
+
+.join-animation__arrivals .join-animation__person--1 {
+  animation: join-person-one 900ms cubic-bezier(.2,.75,.25,1) 100ms both;
+}
+.join-animation__arrivals .join-animation__person--2 {
+  animation: join-person-two 900ms cubic-bezier(.2,.75,.25,1) 160ms both;
+}
+.join-animation__arrivals .join-animation__person--3 {
+  animation: join-person-three 900ms cubic-bezier(.2,.75,.25,1) 220ms both;
+}
+
+.join-animation__you {
+  left: 146px;
+  z-index: 4;
+  width: 56px;
+  height: 56px;
+  border: 3px solid #7ccbe5;
+  background: linear-gradient(180deg, #7ccbe5 0 34%, #fff 34% 66%, #7ccbe5 66%);
+  color: #202020;
+  opacity: 0;
+  transform: scale(.45) translateY(13px);
+}
+
+.join-animation__you span {
+  padding: 3px 5px;
+  border-radius: 7px;
+  background: #fff;
+  font: 700 10px/1.1 system-ui, sans-serif;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
+}
+
+.join-animation__arrivals .join-animation__you {
+  animation: join-you-in 500ms cubic-bezier(.16,1.3,.35,1) 680ms both;
+}
+
+.join-animation__group {
+  opacity: 0;
+  animation: join-group-settle 450ms ease-out 900ms both;
+}
+
+.join-animation__group .join-animation__person--1 { left: 30px; }
+.join-animation__group .join-animation__person--2 { left: 59px; z-index: 3; }
+.join-animation__group .join-animation__person--3 { left: 88px; }
+.join-animation__group .join-animation__you {
+  left: 117px;
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+
+.join-animation__count {
+  position: absolute;
+  bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #bdbdbd;
+  font: 600 12px/1 system-ui, sans-serif;
+  letter-spacing: .02em;
+}
+
+.join-animation__count-old { animation: join-count-out 420ms ease-in 650ms both; }
+.join-animation__count-arrow { color: #7ccbe5; }
+.join-animation__count-new {
+  color: #fff;
+  animation: join-count-in 420ms cubic-bezier(.2,.8,.3,1.3) 650ms both;
+}
+.join-animation__count-label { color: #9f9f9f; font-weight: 500; }
+
+.join-animation__particle {
+  position: absolute;
+  z-index: 1;
+  color: #9cdef0;
+  opacity: 0;
+  font: 700 15px/1 system-ui, sans-serif;
+  animation: join-particle 850ms ease-out 500ms both;
+}
+.join-animation__particle--one { top: 39px; left: calc(50% - 88px); }
+.join-animation__particle--two { top: 64px; left: calc(50% + 91px); animation-delay: 570ms; }
+.join-animation__particle--three { top: 104px; left: calc(50% + 82px); animation-delay: 630ms; }
+.join-animation__particle--four { top: 99px; left: calc(50% - 94px); animation-delay: 690ms; }
+
+@keyframes join-person-one {
+  from { transform: translate(-56px, 25px) scale(.72); opacity: 0; }
+  22% { opacity: 1; }
+  to { transform: translate(-23px, 0) scale(1); opacity: 1; }
+}
+@keyframes join-person-two {
+  from { transform: translateY(-24px) scale(.72); opacity: 0; }
+  22% { opacity: 1; }
+  to { transform: translate(-25px, 0) scale(1); opacity: 1; }
+}
+@keyframes join-person-three {
+  from { transform: translate(52px, 24px) scale(.72); opacity: 0; }
+  22% { opacity: 1; }
+  to { transform: translate(-27px, 0) scale(1); opacity: 1; }
+}
+@keyframes join-you-in {
+  from { opacity: 0; transform: translate(-29px, 18px) scale(.5); }
+  to { opacity: 1; transform: translate(-29px, 0) scale(1); }
+}
+@keyframes join-group-settle { to { opacity: 1; } }
+@keyframes join-count-out { to { opacity: .35; transform: translateY(-5px); } }
+@keyframes join-count-in {
+  from { opacity: 0; transform: translateY(8px) scale(.8); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes join-particle {
+  0% { opacity: 0; transform: translateY(9px) scale(.5); }
+  28% { opacity: .9; }
+  100% { opacity: 0; transform: translateY(-12px) scale(1.1); }
+}
+@keyframes join-glow-in { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .join-animation *,
+  .join-animation *::before,
+  .join-animation *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+  .join-animation__arrivals { display: none; }
+  .join-animation__group { opacity: 1; animation: none; }
+  .join-animation__particle { display: none; }
+  .join-animation__count-old { display: none; }
+  .join-animation__count-arrow { display: none; }
+}
+.join-animation__arrivals{animation:join-arrivals-finish 1ms 1350ms forwards}
+@keyframes join-arrivals-finish{to{visibility:hidden}}

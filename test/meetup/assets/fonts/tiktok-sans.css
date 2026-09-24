@@ -1,0 +1,56 @@
+@font-face {
+  font-family: 'TikTok Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(tiktok-sans-0.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'TikTok Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(tiktok-sans-1.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'TikTok Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(tiktok-sans-2.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'TikTok Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(tiktok-sans-3.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'TikTok Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(tiktok-sans-4.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'TikTok Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(tiktok-sans-5.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'TikTok Sans';
+  font-style: normal;
+  font-weight: 900;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(tiktok-sans-6.ttf) format('truetype');
+}

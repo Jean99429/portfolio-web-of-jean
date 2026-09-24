@@ -1,0 +1,4 @@
+.flow-hint{position:fixed;z-index:2147483646;pointer-events:none;box-sizing:border-box;border:1.5px solid #3794ff;background:rgba(55,148,255,.2);border-radius:6px;opacity:0;visibility:hidden}
+.flow-hint.visible{visibility:visible;animation:flow-hotspot 900ms ease-in-out 1 forwards}
+@keyframes flow-hotspot{0%,100%{opacity:0}30%,65%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.flow-hint.visible{animation:flow-hotspot 900ms linear 1 forwards}}
