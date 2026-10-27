@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preload" as="image" href="assets/wardrobe-preview/anchor-shirt.webp" fetchpriority="high">
+<link rel="preload" as="image" href="assets/wardrobe-preview/08018731.webp" fetchpriority="high">
 <title>Outfit AI 原型</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -442,7 +444,7 @@ function stage(n) { if (EMBED) parent.postMessage({ outfitStep: n }, "*"); }
 const pad = n => String(n).padStart(2, "0");
 
 $("gMeta").textContent = WEATHER;
-$("anchorImg").src = ANCHOR.img;
+// The offscreen anchor image is loaded when generation starts.
 $("anchorName").textContent = ANCHOR.cn;
 
 /* ============ 衣柜（首页）：衣服侧着挂，正中间那件转成正面 ============ */
@@ -471,7 +473,7 @@ function makeRack(el, kind, list, start, box) {
   const hangs = list.map(it => {
     const h = document.createElement("div");
     h.className = "hang";
-    const cloth = `<div class="cloth" style="top:${kind === "tops" ? 14 : 16}px;width:${box[0]}px;height:${box[1]}px;margin-left:${-box[0] / 2}px"><img src="assets/wardrobe/${it.id}.webp" alt=""></div>`;
+    const cloth = `<div class="cloth" style="top:${kind === "tops" ? 14 : 16}px;width:${box[0]}px;height:${box[1]}px;margin-left:${-box[0] / 2}px"><img src="assets/wardrobe-preview/${it.id}.webp" fetchpriority="${Math.abs(list.indexOf(it) - start) <= 1 ? "high" : "low"}" decoding="async" alt=""></div>`;
     h.innerHTML = kind === "tops" ? hookTop() + cloth : cloth + hookBottom(it.id, box);   // 上衣钩子在衣服后面，下装夹子在裤腰前面
     stage.appendChild(h);
     return h;
@@ -573,7 +575,7 @@ function togglePick(R, it) {
 // 底部缩略图：已经选了哪几件（按选的先后排），最后永远留一个「＋」空位
 function updateTray(added) {
   const all = [...WARDROBE.tops, ...WARDROBE.bottoms];
-  $("wTray").innerHTML = [...picked].map(id => `<div class="w-thumb" data-id="${id}"><img src="assets/wardrobe/${id}.webp" alt="${all.find(x => x.id === id).name}"></div>`).join("")
+  $("wTray").innerHTML = [...picked].map(id => `<div class="w-thumb" data-id="${id}"><img src="assets/wardrobe-preview/${id}.webp" alt="${all.find(x => x.id === id).name}"></div>`).join("")
     + `<div class="w-thumb empty"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>`;
   const t = $("wTray").querySelector(`[data-id="${added}"]`);
   if (t) t.animate([{ opacity: 0, transform: "scale(.6)" }, { opacity: 1, transform: "scale(1)" }], { duration: 260, easing: "cubic-bezier(.3,1.4,.6,1)" });
@@ -658,7 +660,7 @@ const cells = LOOKS.map((l, i) => {
   const el = document.createElement("div");
   el.className = "look";
   el.dataset.i = i;
-  el.innerHTML = `<img class="real" src="${l.img}" alt=""><img class="sil" src="${l.img}" alt="">`;
+  el.innerHTML = `<img class="real" data-src="${l.img}" alt=""><img class="sil" data-src="${l.img}" alt="">`;
   origin.appendChild(el);
   return { el, bx, by };
 });
@@ -843,6 +845,10 @@ function stopLoading() {
   loading = false;
 }
 function startLoading() {
+  $("anchorImg").src = ANCHOR.img;
+  cells.forEach(c => c.el.querySelectorAll("img[data-src]").forEach(img => {
+    img.src = img.dataset.src; delete img.dataset.src;
+  }));
   stage(3);
   stopLoading();
   resetEdits();
@@ -919,10 +925,11 @@ const detail = $("detail"), hero = $("hero"), heroImg = $("heroImg"), strip = $(
 let cur = 0, busy = false;
 const fadeEls = () => [$("dBg"), $("dTop"), $("dTitle"), $("prev"), $("next"), $("dCap"), strip, $("dActions")];
 
-strip.innerHTML = LOOKS.map((l, i) => `<button class="t" data-i="${i}" aria-label="LOOK ${pad(i + 1)}"><img src="${l.thumb}" alt=""></button>`).join("");
+strip.innerHTML = LOOKS.map((l, i) => `<button class="t" data-i="${i}" aria-label="LOOK ${pad(i + 1)}"><img data-src="${l.thumb}" alt=""></button>`).join("");
 const thumbs = [...strip.children];
 
 function fillDetail(i, smooth) {
+  strip.querySelectorAll("img[data-src]").forEach(img => { img.src = img.dataset.src; delete img.dataset.src; });
   cur = i;
   heroImg.src = LOOKS[i].img;
   $("dCount").textContent = `${pad(i + 1)} / ${LOOKS.length}`;
