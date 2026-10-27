@@ -834,17 +834,18 @@ render();
 
 /* ============ Loading：文字呼吸 → 灰色剪影从中央散开 → 中心和第一圈先「穿上」，其余陆续 ============ */
 const gLoading = $("gLoading");
-let loading = false, loadTimers = [], introRaf = null;
+let loading = false, loadTimers = [], introRaf = null, loadVersion = 0;
 function isPending(i) { return cells[i].el.classList.contains("pending"); }   // 函数声明：首屏 render() 时就要用到
 function later(fn, ms) { loadTimers.push(setTimeout(fn, ms)); }
 function stopLoading() {
+  loadVersion++;
   loadTimers.forEach(clearTimeout); loadTimers = [];
   $("gProgress").classList.remove("on");
   $("gSeed").classList.remove("on");
   cancelAnimationFrame(introRaf);
   loading = false;
 }
-function startLoading() {
+async function startLoading() {
   $("anchorImg").src = ANCHOR.img;
   cells.forEach(c => c.el.querySelectorAll("img[data-src]").forEach(img => {
     img.src = img.dataset.src; delete img.dataset.src;
@@ -852,6 +853,7 @@ function startLoading() {
   stage(3);
   stopLoading();
   resetEdits();
+  const version = loadVersion;
   loading = true; busy = true;                  // 文字阶段还不能拖
   stopAnim();
   off = targetFor(START, { x: 0, y: 0 });
@@ -862,8 +864,20 @@ function startLoading() {
   seed.querySelector("img").src = seedSrc;
   const sw = seed.querySelector(".sweep");
   sw.style.webkitMaskImage = sw.style.maskImage = `url(${seedSrc})`;
-  seed.classList.add("on");
   gLoading.classList.add("on");
+  // 剪影与彩色人物共用透明图片；先完成解码，再启动展开及换装时间线。
+  try {
+    await Promise.all([seed.querySelector("img"), ...cells.flatMap(c => [...c.el.querySelectorAll("img")])].map(img => img.decode()));
+  } catch (error) {
+    if (version !== loadVersion) return;
+    stopLoading(); busy = false;
+    gLoading.classList.remove("on");
+    openWardrobe();
+    toast("搭配图片加载失败，请再试一次");
+    return;
+  }
+  if (version !== loadVersion) return;
+  seed.classList.add("on");
   // 按离中心的远近排队
   const dist = i => { const q = posOf(cells[i], off); return Math.hypot(q.x / SX, q.y / SY); };
   const order = cells.map((c, i) => i).sort((a, b) => dist(a) - dist(b));
