@@ -2,13 +2,11 @@ window.OutfitLoader = {
   progress(done,total,label) {
     const p=Math.min(100,Math.floor(done/Math.max(1,total)*100));
     document.getElementById('loadPercent').textContent=p;
-    document.getElementById('loadBar').style.width=p+'%';
-    document.getElementById('loadStatus').textContent=label || `正在准备资源 ${done} / ${total}`;
     document.getElementById('demoLoader').setAttribute('aria-valuenow',p);
   },
   hide(){document.body.classList.remove('demo-loading');document.getElementById('demoLoader').hidden=true;},
   show(){document.body.classList.add('demo-loading');document.getElementById('demoLoader').hidden=false;this.progress(0,1);},
-  error(){document.getElementById('loadStatus').textContent='部分资源加载失败，请检查网络后重试';document.getElementById('loadRetry').hidden=false;},
+  error(){const n=document.getElementById('loadPercent');n.tabIndex=0;n.setAttribute('role','button');n.setAttribute('aria-label','重新加载');n.onclick=()=>location.reload();n.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')location.reload();};},
   async fonts(){
     const link=document.querySelector('link[data-demo-fonts]');
     if(link && !link.sheet) await new Promise((resolve,reject)=>{
@@ -28,4 +26,3 @@ window.OutfitLoader = {
     img.src=src;
   });}
 };
-document.getElementById('loadRetry').addEventListener('click',()=>location.reload());
