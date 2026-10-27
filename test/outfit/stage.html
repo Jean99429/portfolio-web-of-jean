@@ -6,9 +6,10 @@
 <link rel="preload" as="image" href="assets/wardrobe-preview/anchor-shirt.webp" fetchpriority="high">
 <link rel="preload" as="image" href="assets/wardrobe-preview/08018731.webp" fetchpriority="high">
 <title>Outfit AI 展示页</title>
+<link rel="stylesheet" href="preload.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&family=Lora:ital@0;1&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<link data-demo-fonts href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&family=Lora:ital@0;1&family=Noto+Sans+SC:wght@300;400&display=swap" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <style>
 :root{
   --ink:#111111;
@@ -79,7 +80,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .note p{font:300 12px/1.75 var(--cn);color:var(--ink-2);margin-top:6px}
 </style>
 </head>
-<body>
+<body class="demo-loading">
+<div class="demo-loader" id="demoLoader" role="progressbar" aria-label="演示资源加载进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+  <div class="demo-load-inner"><div class="demo-load-brand">OUTFIT AI</div><div class="demo-load-number"><b id="loadPercent" style="font-weight:300">0</b><span>%</span></div><div class="demo-load-track"><div class="demo-load-bar" id="loadBar"></div></div><div class="demo-load-status" id="loadStatus">正在准备演示</div><button class="demo-load-retry" id="loadRetry" hidden>重新加载</button></div>
+</div>
+<script src="preload-manifest.js"></script>
+<script src="preload.js"></script>
+
 <div class="wall">
   <section class="left">
     <div class="masthead">
@@ -90,7 +97,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   </section>
 
   <div class="phone-slot" id="slot">
-    <iframe id="proto" src="index.html?v=20261027-4" title="可交互原型"></iframe>
+    <iframe id="proto" src="index.html?v=20261027-5" title="可交互原型"></iframe>
   </div>
 
   <section class="right">
@@ -170,13 +177,17 @@ function show(i) {
 
 // 原型告诉我们走到了第几步
 window.addEventListener("message", e => {
+  if (e.source !== $('proto').contentWindow) return;
+  if (!loadFailed && e.data && e.data.outfitLoading) { loadProgress=e.data.outfitLoading;OutfitLoader.progress(loadProgress.done+(wallReady?1:0),loadProgress.total+1,loadProgress.label); }
+  if (e.data && e.data.outfitLoadError) {loadFailed=true;OutfitLoader.error();}
+  if (e.data && e.data.outfitReady) { prototypeReady=true;revealDemo(); }
   const n = e.data && e.data.outfitStep;
   if (n >= 1 && n <= STEPS.length) show(n - 1);
 });
 
 // 重新体验：原型从头加载（回到开屏弹窗）
 $("restart").addEventListener("click", () => {
-  seen.clear();
+  seen.clear();cur=-1;prototypeReady=false;OutfitLoader.show();
   $("proto").src = "index.html?r=" + Date.now();   // 直接换地址重载（本地打开时不能跨页面调用 reload）
 });
 
@@ -190,7 +201,9 @@ function fit() {
 }
 addEventListener("resize", fit);
 fit();
-show(0);
+let prototypeReady=false,wallReady=false,loadFailed=false,loadProgress={done:0,total:OUTFIT_ASSETS.length+2};
+function revealDemo(){if(loadFailed || !prototypeReady || !wallReady)return;OutfitLoader.progress(1,1,'资源已就绪');OutfitLoader.hide();show(0);$('proto').contentWindow.postMessage({outfitStart:true},'*');}
+OutfitLoader.fonts().then(()=>{wallReady=true;revealDemo();}).catch(()=>{loadFailed=true;OutfitLoader.error();});
 </script>
 </body>
 </html>

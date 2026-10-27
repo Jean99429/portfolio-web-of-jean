@@ -6,9 +6,10 @@
 <link rel="preload" as="image" href="assets/wardrobe-preview/anchor-shirt.webp" fetchpriority="high">
 <link rel="preload" as="image" href="assets/wardrobe-preview/08018731.webp" fetchpriority="high">
 <title>Outfit AI 原型</title>
+<link rel="stylesheet" href="preload.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Lora:ital@0;1&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<link data-demo-fonts href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Lora:ital@0;1&family=Noto+Sans+SC:wght@300;400&display=swap" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <style>
 :root{
   --ink:#111111;
@@ -297,7 +298,13 @@ img{display:block;-webkit-user-drag:none;user-select:none}
 .arrow,.d-cap,.d-strip{transition:opacity .3s ease}
 </style>
 </head>
-<body>
+<body class="demo-loading">
+<div class="demo-loader" id="demoLoader" role="progressbar" aria-label="演示资源加载进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+  <div class="demo-load-inner"><div class="demo-load-brand">OUTFIT AI</div><div class="demo-load-number"><b id="loadPercent" style="font-weight:300">0</b><span>%</span></div><div class="demo-load-track"><div class="demo-load-bar" id="loadBar"></div></div><div class="demo-load-status" id="loadStatus">正在准备演示</div><button class="demo-load-retry" id="loadRetry" hidden>重新加载</button></div>
+</div>
+<script src="preload-manifest.js"></script>
+<script src="preload.js"></script>
+
 
 <div class="phone" id="phone">
   <div class="status">
@@ -440,7 +447,8 @@ const $ = id => document.getElementById(id);
 /* 嵌在展示页（stage.html）里时：背景透明，并把「现在走到第几步」告诉展示页 */
 const EMBED = window.parent !== window;
 if (EMBED) document.documentElement.classList.add("embed");
-function stage(n) { if (EMBED) parent.postMessage({ outfitStep: n }, "*"); }
+let demoStarted = false;
+function stage(n) { if (demoStarted && EMBED) parent.postMessage({ outfitStep: n }, "*"); }
 const pad = n => String(n).padStart(2, "0");
 
 $("gMeta").textContent = WEATHER;
@@ -629,7 +637,7 @@ function closeSheet() {
   sheetWrap.classList.remove("on");
   setTimeout(() => sheetWrap.classList.remove("open"), 500);
 }
-setTimeout(openSheet, 700);
+// 开屏计时由资源加载完成后的 startDemo() 启动。
 $("sLater").addEventListener("click", closeSheet);
 $("scrim").addEventListener("click", closeSheet);
 // 「用这件生成搭配」：弹窗收起 → 衣架上的衬衫被选中（缩略图出现）→ 等用户点底部按钮再开始生成
@@ -1626,6 +1634,32 @@ document.addEventListener("pointerup", e => {
   const inside = e.clientX >= left && e.clientX <= left + w && e.clientY >= top && e.clientY <= top + h;
   if (tap && !inside) hintAgain();      // 拖动不算点错
 }, true);
+
+// 所有图片及字体完成后，才揭开演示并开始开屏计时。
+function startDemo() {
+  if (demoStarted) return;
+  demoStarted=true;
+  OutfitLoader.hide();
+  setTimeout(openSheet,700);
+}
+window.addEventListener('message',e=>{if(EMBED && e.source===parent && e.data && e.data.outfitStart) startDemo();});
+(async()=>{
+  const total=OUTFIT_ASSETS.length+2;
+  let done=0,index=0,failed=false;
+  const report=(label)=>{if(failed)return;OutfitLoader.progress(done,total,label);if(EMBED)parent.postMessage({outfitLoading:{done,total,label}},'*');};
+  const advance=()=>{done++;report();};
+  try {
+    report();
+    const fontTask=OutfitLoader.fonts().then(advance);
+    async function worker(){while(index<OUTFIT_ASSETS.length){const src=OUTFIT_ASSETS[index++];imgCache[src]=await OutfitLoader.image(src);advance();}}
+    await Promise.all([fontTask,...Array.from({length:6},worker)]);
+    document.querySelectorAll('img[data-src]').forEach(img=>{img.src=img.dataset.src;delete img.dataset.src;});
+    $('anchorImg').src=ANCHOR.img;
+    await Promise.all([...document.images].filter(img=>img.getAttribute('src')).map(img=>img.decode()));
+    done++;report('资源已就绪，正在开始演示');
+    if(EMBED)parent.postMessage({outfitReady:true},'*');else startDemo();
+  } catch(error) {failed=true;OutfitLoader.error();if(EMBED)parent.postMessage({outfitLoadError:true},'*');}
+})();
 </script>
 </body>
 </html>
