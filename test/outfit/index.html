@@ -1127,7 +1127,7 @@ const liftCv = $("lift"), lctx = liftCv.getContext("2d");
 liftCv.width = 360 * DPR; liftCv.height = 480 * DPR;
 const off2 = document.createElement("canvas"), o2 = off2.getContext("2d");
 off2.width = liftCv.width; off2.height = liftCv.height;
-let liftTimer = null, liftRaf = null;
+let liftTimer = null, liftRaf = null, liftVersion = 0;
 const LIFT_SCALE = 1.02, LIFT_MS = 250;
 
 // 在画布里一次画好（不再用 CSS 放大，避免变糊）：s = 放大倍数，a = 阴影深浅（0–1）
@@ -1161,6 +1161,7 @@ function drawLift(mask, cx, cy, s, a) {
 }
 
 function liftSelect(it) {
+  const version = ++liftVersion;
   clearTimeout(liftTimer);
   cancelAnimationFrame(liftRaf);
   const wasOn = liftCv.classList.contains("on");
@@ -1170,6 +1171,7 @@ function liftSelect(it) {
   const [x0, y0, x1, y1] = it.box;
   const cx = (x0 + x1) / 2 * liftCv.width, cy = (y0 + y1) / 2 * liftCv.height;
   const start = () => {
+    if (version !== liftVersion) return;
     liftCv.classList.add("on");
     const t0 = performance.now();
     const step = now => {
@@ -1323,7 +1325,8 @@ function swapLook(i, data) {
   Object.assign(L, data);
   cells[i].el.querySelector(".real").src = L.img;
   thumbs[i].querySelector("img").src = L.thumb;
-  if (i !== cur) return;
+  if (i !== cur) return Promise.resolve();
+  return new Promise(resolve => {
   const next = new Image();
   next.className = "next-img"; next.src = L.img; next.alt = "";
   const setMask = (el, css) => { el.style.webkitMaskImage = css; el.style.maskImage = css; };
@@ -1339,13 +1342,14 @@ function swapLook(i, data) {
       setMask(heroImg, `linear-gradient(transparent ${p - soft}%, #000 ${p + soft}%)`);
       if (k < 1) return requestAnimationFrame(step);
       heroImg.src = L.img;
-      heroImg.decode().catch(() => {}).then(() => { setMask(heroImg, ""); next.remove(); });
+      heroImg.decode().catch(() => {}).then(() => { setMask(heroImg, ""); next.remove(); resolve(); });
     };
     requestAnimationFrame(step);
   };
   next.decode ? next.decode().then(run, run) : (next.onload = run);
   $("dReason").textContent = L.reason;
   $("dReason").animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 200, easing: "ease-out", fill: "backwards" });
+  });
 }
 function refreshUndo() { $("dUndo").classList.toggle("on", !!edited[cur]); }
 
@@ -1371,13 +1375,14 @@ function send() {
     fxSelect(it, true);                     // 光贴着这件衣服反复扫
   }, 250);
 
-  setTimeout(() => {
+  setTimeout(async () => {
     genTip.classList.remove("on");
     const L = LOOKS[cur];
     edited[cur] = { img: L.img, thumb: L.thumb, reason: L.reason };
-    swapLook(cur, { img: DEMO.img, thumb: DEMO.thumb, reason: DEMO.reason });
+    const swapped = swapLook(cur, { img: DEMO.img, thumb: DEMO.thumb, reason: DEMO.reason });
     setTimeout(() => fxSelect(null), 250);                  // 擦的同时，光慢慢收掉
-    setTimeout(() => { finish(); refreshUndo(); nudgeWear(); stage(7); }, 1100);
+    await swapped;
+    finish(); refreshUndo(); nudgeWear(); stage(7);
   }, 3600);
 
   function finish() {
@@ -1449,6 +1454,7 @@ $("btnWear").addEventListener("click", () => {
   const pieces = items.map(({ it, slot }) => {
     const el = document.createElement("div");
     el.className = "piece";
+    el.style.visibility = "hidden";
     const [x0, y0, x1, y1] = slot.box;
     Object.assign(el.style, { left: x0 * 292 + "px", top: y0 * 360 + "px", width: (x1 - x0) * 292 + "px", height: (y1 - y0) * 360 + "px" });
     el.innerHTML = `<img src="assets/card/${it.id}.webp" alt="">`;
@@ -1456,14 +1462,12 @@ $("btnWear").addEventListener("click", () => {
     return { el, it, slot };
   });
 
-  // 详情页的其他元素淡出，模特随后淡出
-  const outs = [$("dTop"), $("dTitle"), $("prev"), $("next"), $("dCap"), strip, $("dActions")];
-  outs.forEach(el => el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: "ease-in", fill: "forwards" }));
-  hero.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, delay: 120, easing: "ease-in", fill: "forwards" });
-
-  // 每件单品从它在模特身上的位置，飞到卡片上的位置
-  const hr = hero.getBoundingClientRect();
+  // 单品图片准备好后，再同步开始模特淡出和卡片飞入。
   Promise.all(pieces.map(p => p.el.querySelector("img").decode().catch(() => {}))).then(() => {
+    const outs = [$("dTop"), $("dTitle"), $("prev"), $("next"), $("dCap"), strip, $("dActions")];
+    outs.forEach(el => el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: "ease-in", fill: "forwards" }));
+    hero.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, delay: 120, easing: "ease-in", fill: "forwards" });
+    const hr = hero.getBoundingClientRect();
     pieces.forEach((p, n) => {
       const to = p.el.querySelector("img").getBoundingClientRect();
       const [bx0, by0, bx1, by1] = p.it.box;
@@ -1471,6 +1475,7 @@ $("btnWear").addEventListener("click", () => {
       const sc = Math.min(from.width / to.width, from.height / to.height);
       const dx = from.left + from.width / 2 - (to.left + to.width / 2);
       const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+      p.el.style.visibility = "visible";
       p.el.animate([
         { transform: `translate(${dx}px,${dy}px) scale(${sc})`, opacity: 0 },
         { opacity: 1, offset: .2 },
