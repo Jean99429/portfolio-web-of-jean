@@ -1,0 +1,1605 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Outfit AI 原型</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Lora:ital@0;1&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#111111;
+  --ink-2:#6f6c66;
+  --ink-3:#aaa69e;
+  --paper:#ffffff;
+  --outside:#e4e1db;
+  --sans:"Montserrat","Noto Sans SC",sans-serif;
+  --serif:"Lora","Noto Sans SC",serif;
+  --cn:"Noto Sans SC","PingFang SC",sans-serif;
+  --ease-out:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--outside);display:flex;align-items:center;justify-content:center;font-family:var(--cn);color:var(--ink);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+img{display:block;-webkit-user-drag:none;user-select:none}
+
+/* ---------- 手机外框 ---------- */
+.phone{position:relative;width:390px;height:844px;background:var(--paper);border-radius:48px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.18),0 0 0 10px #111;user-select:none;-webkit-user-select:none}
+.embed body{background:transparent}
+.embed .phone{box-shadow:0 0 0 10px #111,0 12px 30px rgba(0,0,0,.14)}   /* 投影收小，免得在展示页里被切掉 */
+@media (max-width:480px){body{display:block}.phone{width:100vw;height:100dvh;border-radius:0;box-shadow:none}}
+/* iOS 状态栏 */
+.status{position:absolute;inset:0 0 auto 0;height:59px;z-index:80;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 46px;pointer-events:none;color:#000}
+/* 灵动岛 */
+.island{position:absolute;top:11px;left:50%;width:125px;height:37px;margin-left:-62.5px;border-radius:20px;background:#000;z-index:95;pointer-events:none}
+.status .time{font:600 17px/1 -apple-system,"SF Pro Text",system-ui,sans-serif;letter-spacing:-.02em}
+.status .icons{display:block}
+/* iOS 底部 Home 指示条：下方 34px 是安全区，可点的东西不放进去 */
+:root{--safe-bottom:34px}
+.home-ind{position:absolute;bottom:8px;left:50%;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:#000;z-index:90;pointer-events:none}
+.screen{position:absolute;inset:0;background:var(--paper);z-index:0;isolation:isolate}
+
+/* 顶栏的文字按钮：图标 + 中文 */
+.nav-btn{font:400 13px/1 var(--cn);letter-spacing:.04em;color:var(--ink)}
+/* 小号功能文字：全大写、宽字距 */
+.label{font:400 10px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase}
+
+/* ---------- 衣柜页（首页） ---------- */
+.wardrobe{z-index:20;background:#fff;user-select:none}
+.w-head{position:absolute;top:44px;left:0;right:0;padding:19px 20px 0}
+/* 第一行是导航栏：左边头像、右边天气，和网格页顶栏（左边「‹ 衣柜」、右边天气）同一条中线，切换页面时不跳
+   第二行是大标题 */
+.w-row1{display:flex;align-items:center;justify-content:space-between}
+.w-title{margin-top:18px}
+.w-avatar{width:36px;height:36px;border-radius:50%;background:#efece6;display:grid;place-items:center;flex:none}
+.w-avatar{overflow:hidden}
+.w-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.w-en{font:500 20px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase}
+.rack{position:absolute;left:0;right:0;touch-action:none;cursor:grab}
+.rack.tops{top:165px;height:223px}
+.rack.bottoms{top:421px;height:261px}
+.rack-label{position:absolute;left:20px;top:0;font:400 10px/1 var(--sans);color:var(--ink);letter-spacing:.2em;text-transform:uppercase;z-index:200}
+.rod{position:absolute;left:-10px;right:-10px;top:24px;height:3px;border-radius:2px;background:linear-gradient(#cfcac2,#a9a39a);box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.rack-stage{position:absolute;left:0;right:0;top:25px;bottom:22px;perspective:760px;perspective-origin:50% 10%}
+.hang{position:absolute;left:50%;top:0;transform-origin:50% 0;will-change:transform}
+.hang .hook{position:absolute;left:50%;top:-8px;overflow:visible}
+.hang .hook path{fill:none;stroke:#8f897f;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.hang .hook rect{fill:#77726a}
+.hang .cloth{position:absolute;left:50%;display:flex;align-items:flex-start;justify-content:center}
+.hang .cloth img{max-width:100%;max-height:100%;filter:drop-shadow(0 6px 8px rgba(0,0,0,.10))}
+.hang.picked .cloth img{filter:drop-shadow(0 10px 14px rgba(0,0,0,.18))}
+.w-tray{position:absolute;left:0;right:0;bottom:calc(var(--safe-bottom) + 70px);height:42px;display:flex;justify-content:center;gap:8px;transition:opacity .3s}
+.w-tray.hide{opacity:0}
+.w-thumb{width:42px;height:42px;border-radius:10px;background:#f4f2ee;padding:5px;flex:none}
+/* 空位：灰底 + 加号，一直留在最后，表示还可以再选 */
+.w-thumb.empty{display:grid;place-items:center}
+.w-thumb.empty svg{width:16px;height:16px;fill:none;stroke:var(--ink-3);stroke-width:1.4;stroke-linecap:round}
+.w-thumb img{width:100%;height:100%;object-fit:contain;display:block}
+/* AI 按钮：黑色胶囊 + 一道光缓缓扫过（呼应「生成中」的扫光） */
+.w-ai{position:absolute;left:20px;right:20px;bottom:calc(var(--safe-bottom) + 8px);height:50px;border-radius:25px;background:var(--ink);color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:8px;font:400 15px/1 var(--cn);letter-spacing:.04em;overflow:hidden;transition:background-color .3s,color .3s,scale .15s}
+.w-ai svg{width:14px;height:14px;fill:currentColor;position:relative;top:1.4px}   /* 星星图形本身偏上、中文字形偏下，往下挪一点和文字对齐 */
+.w-ai:disabled{background:#efece6;color:var(--ink-3);cursor:default}
+
+/* ---------- 网格页 ---------- */
+.g-head{position:absolute;top:44px;left:0;right:0;z-index:20;padding:29px 20px 26px}
+/* 上下边缘：方案靠近屏幕边缘时渐渐变透明（不用模糊，避免灰色光晕） */
+.grid{-webkit-mask-image:linear-gradient(transparent 100px,#000 200px,#000 calc(100% - 134px),transparent calc(100% - 34px));mask-image:linear-gradient(transparent 100px,#000 200px,#000 calc(100% - 134px),transparent calc(100% - 34px))}
+.g-row{display:flex;align-items:center;justify-content:space-between}
+.g-back{display:flex;align-items:center;gap:6px;color:var(--ink)}
+.g-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.3}
+.g-meta{color:var(--ink-2)}
+.g-anchor{display:flex;align-items:center;gap:12px;margin-top:18px}
+.g-anchor .thumb{width:38px;height:38px;border-radius:50%;background:#f4f3ef;overflow:hidden;display:grid;place-items:center}
+.g-anchor .thumb img{width:30px;margin-top:6px}
+.g-k{font:italic 400 12px/1 var(--serif);color:var(--ink-2)}
+.g-t{font:300 15px/1.2 var(--cn);margin-top:5px;letter-spacing:.06em}
+
+.grid{position:absolute;top:44px;bottom:0;left:0;right:0;z-index:0;isolation:isolate;background:#fff;touch-action:none;cursor:grab;overflow:hidden}
+.grid.dragging{cursor:grabbing}
+.origin{position:absolute;left:50%;top:calc(50% + 16px);width:0;height:0}
+.look{position:absolute;left:-135px;top:-180px;width:270px;height:360px;transform-origin:50% 50%}
+.look img{width:100%;height:100%;pointer-events:none}
+/* Loading：没做好的方案是一个灰色模特剪影在呼吸；做好后衣服「穿上」、颜色出现 */
+.look .sil{position:absolute;left:0;top:0;filter:brightness(0) opacity(.06);animation:sil 1.8s ease-in-out infinite;transition:opacity .7s ease}
+@keyframes sil{50%{filter:brightness(0) opacity(.12)}}
+.look:not(.pending) .sil{opacity:0;animation:none}
+.look .real{transition:opacity .8s ease}
+.look.pending .real{opacity:0}
+/* 第一阶段：中央一个灰色模特剪影，一道光一遍遍从上往下扫过（和精修生成时的扫光同一种语言） */
+.g-seed{position:absolute;left:-135px;top:-180px;width:270px;height:360px;z-index:5500;pointer-events:none;opacity:0;transition:opacity .35s ease}
+.g-seed.on{opacity:1}
+.g-seed img{width:100%;height:100%;filter:brightness(0) opacity(.08)}
+.g-seed .sweep{position:absolute;inset:0;-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  background:linear-gradient(180deg,transparent 38%,rgba(150,170,235,.5) 50%,transparent 62%);background-size:100% 300%;animation:seedSweep 1.8s ease-in-out infinite}
+@keyframes seedSweep{from{background-position:0 100%}to{background-position:0 0}}
+.g-loading{position:absolute;left:0;right:0;top:calc(50% + 16px + 196px);margin-top:-6px;z-index:6000;text-align:center;pointer-events:none;opacity:0;transition:opacity .45s ease}
+.g-loading.on{opacity:1}
+.g-loading span{display:inline-block;font:400 11px/1 var(--sans);letter-spacing:.32em;text-transform:uppercase;color:var(--ink);animation:breathe 1.6s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:1}50%{opacity:.3}}
+.g-progress{position:absolute;left:50%;bottom:calc(var(--safe-bottom) + 14px);z-index:25;display:flex;align-items:center;gap:4px;padding:8px 14px;border-radius:16px;
+  background:rgba(255,255,255,.94);box-shadow:0 1px 2px rgba(0,0,0,.05),0 6px 18px rgba(0,0,0,.08);font:300 12px/1 var(--cn);color:var(--ink);letter-spacing:.04em;white-space:nowrap;
+  opacity:0;transform:translate(-50%,6px);transition:opacity .35s ease,transform .45s var(--ease-out);pointer-events:none}
+.g-progress.on{opacity:1;transform:translate(-50%,0)}
+.g-progress b{font-weight:400;margin:0 2px}
+.g-progress i{display:inline-block;width:3px;height:3px;margin-left:2px;border-radius:50%;background:currentColor;animation:dot 1s infinite}
+.g-progress i:nth-child(3){animation-delay:.15s}.g-progress i:nth-child(4){animation-delay:.3s}
+.g-progress svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;margin-right:2px}
+
+/* 名称挂在焦点模特的脚下，和图是一个整体 */
+.g-name{position:absolute;left:50%;width:320px;margin-left:-160px;top:calc(50% + 16px + 184px);z-index:5000;text-align:center;pointer-events:none;opacity:0}
+/* 网格里的名称是安静的小标签，像展签；详情页才是大标题 */
+.g-en{font:500 13px/1.2 var(--sans);letter-spacing:.14em;text-transform:uppercase}
+.g-cn{font:300 11px/1 var(--cn);color:var(--ink-2);margin-top:5px;letter-spacing:.04em}
+
+/* ---------- 详情页 ---------- */
+.detail{display:none;z-index:40;background:transparent}
+.detail.open{display:block}
+.d-bg{position:absolute;inset:0;background:#fff}
+.d-top{position:absolute;top:44px;left:0;right:0;height:48px;z-index:3;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.d-top button{height:40px;padding:0 8px;display:flex;align-items:center;gap:6px}
+.d-top svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.3}
+.d-count{color:var(--ink-2);padding-right:10px}
+/* 名称在上面，像杂志标题 */
+.d-title{position:absolute;top:98px;left:0;right:0;padding:0 24px;text-align:center;z-index:3}
+.d-stage{position:absolute;top:150px;left:0;right:0;height:480px}
+.hero{position:absolute;left:50%;top:0;width:360px;height:480px;margin-left:-180px;transform-origin:50% 50%}
+.hero img{width:100%;height:100%}
+.arrow{position:absolute;top:50%;width:44px;height:64px;margin-top:-32px;display:grid;place-items:center;z-index:2;color:var(--ink)}
+.arrow svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.1}
+.arrow.prev{left:4px}.arrow.next{right:4px}
+.arrow:disabled{opacity:.18;cursor:default}
+/* 理由在模特脚下，像图说：小一号、灰色 */
+.d-cap{position:absolute;left:0;right:0;top:628px;padding:0 40px;text-align:center}
+.d-en{font:500 20px/1.2 var(--sans);letter-spacing:.2em;text-transform:uppercase}
+.d-cn{font:300 12px/1 var(--cn);color:var(--ink-2);margin-top:6px;letter-spacing:.12em}
+.d-reason{font:300 12px/1.7 var(--cn);color:var(--ink-2)}
+.d-strip{position:absolute;left:0;right:0;bottom:calc(var(--safe-bottom) + 58px);height:72px;display:flex;gap:4px;align-items:flex-start;padding:0 calc(50% - 22px);overflow-x:auto;scrollbar-width:none}
+.d-strip::-webkit-scrollbar{display:none}
+.t{flex:0 0 44px;height:72px;display:flex;flex-direction:column;align-items:center;opacity:.45;transition:opacity .3s}
+.t img{width:44px;height:58px}
+.t::after{content:"";width:0;height:1px;background:var(--ink);margin-top:6px;transition:width .35s var(--ease-out)}
+.t.on{opacity:1}
+.t.on::after{width:22px}
+
+/* ---------- 精修：点单品 + prompt ---------- */
+.hero{cursor:pointer}
+/* 选中效果画在一张和大图重合的画布上：贴着单品轮廓的光扫过 */
+.fx{position:absolute;left:50%;top:0;width:360px;height:480px;margin-left:-180px;z-index:1;pointer-events:none}
+/* 选中态（只在演示的第 20 套）：衣服在原地轻轻放大 + 边缘下方一层柔和的阴影，颜色不变 */
+.lift{position:absolute;left:50%;top:0;width:360px;height:480px;margin-left:-180px;z-index:1;pointer-events:none;
+  opacity:0;transition:opacity .15s ease}
+.lift.on{opacity:1}
+/* 点下去的位置：一个小圆点，像 Figma 评论的落点 */
+.pin{position:absolute;z-index:2;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--ink);
+  box-shadow:0 0 0 3px #fff;opacity:0;transform:scale(.4);pointer-events:none;
+  transition:opacity .2s ease,transform .35s var(--ease-out),left .38s var(--ease-out),top .38s var(--ease-out)}
+.pin.on{opacity:1;transform:none}
+/* 输入框：白色单行胶囊，从点下去的位置冒出来 */
+.ask{position:absolute;z-index:3;height:42px;display:flex;align-items:center;gap:6px;padding:0 4px 0 16px;
+  border-radius:21px;background:#fff;border:1px solid #e6e3dd;box-shadow:0 1px 2px rgba(0,0,0,.05),0 10px 28px rgba(0,0,0,.10);
+  opacity:0;pointer-events:none;transform:scale(.92);
+  transition:opacity .22s ease,transform .38s var(--ease-out),left .38s var(--ease-out),top .38s var(--ease-out),width .3s var(--ease-out)}
+.ask.on{opacity:1;pointer-events:auto;transform:none}
+.ask input{flex:1;min-width:0;border:0;background:none;outline:none;font:300 13px/1 var(--cn);color:var(--ink);letter-spacing:.02em}
+.ask input::placeholder{color:var(--ink-3)}
+.ask button{width:32px;height:32px;flex:none;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center}
+.ask button svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.7}
+/* 底部按钮行：问问 AI（改整体）+ 就穿这套（最终操作） */
+.d-actions{position:absolute;left:16px;right:16px;bottom:calc(var(--safe-bottom) + 6px);height:46px;display:flex;gap:10px;transition:opacity .3s ease}
+.d-actions button{height:46px;border-radius:23px;display:flex;align-items:center;justify-content:center;gap:7px;font:400 14px/1 var(--cn);letter-spacing:.04em}
+.btn-ai{flex:1.6;background:#fff;border:1px solid #e6e3dd;color:var(--ink)}
+.btn-ai svg{width:13px;height:13px;fill:currentColor}
+.btn-wear{flex:1;background:var(--ink);color:#fff}
+.btn-wear.ready{animation:ready 1.6s var(--ease-out) 1}
+@keyframes ready{0%{box-shadow:0 0 0 0 rgba(17,17,17,.35)}70%{box-shadow:0 0 0 10px rgba(17,17,17,0)}100%{box-shadow:0 0 0 0 rgba(17,17,17,0)}}
+
+/* 生成中：黑点旁边的一行小字 */
+.gen-tip{position:absolute;z-index:3;padding:7px 12px;border-radius:14px;background:rgba(255,255,255,.92);
+  box-shadow:0 1px 2px rgba(0,0,0,.05),0 6px 18px rgba(0,0,0,.08);font:300 12px/1 var(--cn);color:var(--ink);white-space:nowrap;
+  opacity:0;transform:translateY(4px);transition:opacity .25s ease,transform .35s var(--ease-out);pointer-events:none}
+.gen-tip.on{opacity:1;transform:none}
+.gen-tip i{display:inline-block;width:4px;height:4px;margin-left:2px;border-radius:50%;background:currentColor;animation:dot 1s infinite}
+.gen-tip i:nth-child(2){animation-delay:.15s}.gen-tip i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,100%{opacity:.2}50%{opacity:1}}
+.hero .next-img{position:absolute;inset:0;width:100%;height:100%}
+/* 撤回：顶栏右侧，只在改过的那一套出现 */
+.d-undo{display:flex;align-items:center;gap:6px;height:40px;padding:0 8px;color:var(--ink);opacity:0;pointer-events:none;transition:opacity .3s ease}
+.d-undo.on{opacity:1;pointer-events:auto}
+.d-undo svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.4}
+.d-right{display:flex;align-items:center}
+
+/* ---------- 结尾：今日穿搭卡片（拍立得 + 单品分层平铺） ---------- */
+.ending{position:absolute;inset:0;z-index:60;display:none;pointer-events:none}
+.ending.open{display:block}
+.card{position:absolute;left:50%;top:118px;width:320px;margin-left:-160px;padding:14px 14px 0;border-radius:3px;
+  background:rgba(255,255,255,0);box-shadow:0 0 0 rgba(0,0,0,0);
+  transition:background-color .5s ease,box-shadow .6s ease}
+.card.framed{background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 50px rgba(0,0,0,.12)}
+.c-photo{position:relative;width:292px;height:360px;background:rgba(243,241,236,0);transition:background-color .5s ease}
+.card.framed .c-photo{background:#f3f1ec}
+.piece{position:absolute;display:flex;align-items:center;justify-content:center;transform-origin:50% 50%}
+.piece img{max-width:100%;max-height:100%;filter:drop-shadow(0 4px 6px rgba(0,0,0,.12))}
+.c-info{height:96px;padding:16px 4px 0;opacity:0;transition:opacity .5s ease}
+.c-en{font:500 17px/1.2 var(--sans);letter-spacing:.14em;text-transform:uppercase}
+.c-cn{font:300 11px/1 var(--cn);color:var(--ink-2);margin-top:7px;letter-spacing:.06em}
+.c-meta{display:flex;justify-content:space-between;margin-top:14px;font:300 11px/1 var(--cn);color:var(--ink-2);letter-spacing:.04em}
+.e-saved{position:absolute;left:0;right:0;top:704px;text-align:center;font:300 12px/1 var(--cn);color:var(--ink-2);opacity:0;transition:opacity .5s ease}
+.e-back{position:absolute;left:50%;top:732px;transform:translateX(-50%);height:44px;padding:0 22px;border-radius:22px;border:1px solid #e6e3dd;background:#fff;
+  display:flex;align-items:center;gap:7px;font:400 14px/1 var(--cn);color:var(--ink);opacity:0;transition:opacity .5s ease}
+.e-back svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.ending.done .c-info,.ending.done .e-saved,.ending.done .e-back{opacity:1}
+.ending.done{pointer-events:auto}
+
+/* ---------- 开屏弹窗：你很久没穿这件了 ---------- */
+.sheet-wrap{position:absolute;inset:0;z-index:70;display:none}
+.sheet-wrap.open{display:block}
+.scrim{position:absolute;inset:0;background:rgba(17,17,17,.32);opacity:0;transition:opacity .35s ease}
+.sheet-wrap.on .scrim{opacity:1}
+.sheet{position:absolute;left:8px;right:8px;bottom:8px;border-radius:32px;background:#fff;padding:24px 20px 10px;text-align:center;
+  transform:translateY(110%);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.sheet-wrap.on .sheet{transform:none}
+.s-photo{width:132px;height:156px;margin:0 auto;border-radius:20px;background:#f4f2ee;display:grid;place-items:center;padding:14px}
+.s-photo img{max-width:100%;max-height:100%}
+.s-title{font:400 18px/1.3 var(--cn);letter-spacing:.04em;margin-top:16px}
+.s-sub{font:300 12px/1 var(--cn);color:var(--ink-2);letter-spacing:.04em;margin-top:8px}
+.sheet .w-ai{position:relative;left:auto;right:auto;bottom:auto;width:100%;margin-top:18px}
+.s-later{width:100%;height:32px;margin-top:0;font:400 14px/1 var(--cn);color:var(--ink-2);letter-spacing:.04em}
+
+/* ---------- 演示引导：Figma 原型热区那样的蓝框，闪一下就消失，不挡点击 ---------- */
+.flow-hint{position:fixed;z-index:2147483646;pointer-events:none;box-sizing:border-box;border:1.5px solid #3794ff;background:rgba(55,148,255,.2);border-radius:6px;opacity:0;visibility:hidden}
+.flow-hint.on{visibility:visible;animation:flow-hotspot .9s ease-in-out 1 forwards}
+@keyframes flow-hotspot{0%,100%{opacity:0}30%,65%{opacity:1}}
+
+/* ---------- 屏幕中间的提示（toast）：演示没覆盖到的操作，统一用它说明 ---------- */
+.toast{position:absolute;left:50%;top:50%;z-index:120;max-width:290px;width:max-content;padding:12px 18px;border-radius:14px;background:rgba(17,17,17,.88);color:#fff;
+  font:300 13px/1.5 var(--cn);letter-spacing:.04em;text-align:center;pointer-events:none;
+  opacity:0;transform:translate(-50%,-50%) scale(.94);transition:opacity .22s ease,transform .3s var(--ease-out)}
+.toast.on{opacity:1;transform:translate(-50%,-50%)}
+
+/* ---------- 仿 iOS 中文拼音键盘 ---------- */
+.kb{position:absolute;left:0;right:0;bottom:0;z-index:30;background:#d1d4da;transform:translateY(100%);
+  transition:transform .38s cubic-bezier(.2,.8,.2,1);font-family:-apple-system,"SF Pro Text","PingFang SC",system-ui,sans-serif;color:#000}
+.kb.on{transform:none}
+.kb-cand{height:44px;display:flex;align-items:center;gap:26px;padding:0 18px;font-size:17px;color:#000}
+.kb-keys{padding:6px 3px 4px}
+.kb-row{display:flex;justify-content:center;gap:6px;margin-bottom:11px}
+.kb-row:last-child{margin-bottom:0}
+.key{height:42px;flex:0 0 33px;border-radius:5px;background:#fff;box-shadow:0 1px 0 rgba(0,0,0,.3);
+  display:grid;place-items:center;font-size:22px;font-weight:300;line-height:1;transition:background-color .08s}
+.key.fn{background:#abb0ba;font-size:15px;font-weight:400}
+.key.down{background:#abb0ba}
+.key.fn.down{background:#fff}
+.key svg{width:20px;height:20px;fill:none;stroke:#000;stroke-width:1.6}
+.key.wide{flex:0 0 42px}
+.key.space{flex:1 1 auto;font-size:15px;font-weight:400}
+.key.ret{flex:0 0 88px;background:#0a84ff;color:#fff;font-size:15px;font-weight:400}
+.kb-bottom{height:72px;display:flex;justify-content:space-between;padding:6px 22px 0}
+.kb-bottom svg{width:26px;height:26px;fill:none;stroke:#5b5f66;stroke-width:1.5}
+.d-title{transition:opacity .3s ease}
+.detail.kb-up .d-title,.detail.kb-up .d-count{opacity:0}
+.d-stage{transition:transform .38s cubic-bezier(.2,.8,.2,1)}
+
+/* ---------- 按下反馈：胶囊按钮轻轻缩一下，文字和图标按钮变淡 ---------- */
+.btn-ai,.btn-wear,.w-avatar{transition:scale .15s ease}
+.e-back{transition:opacity .5s ease,scale .15s ease}
+.w-ai:not(:disabled):active,.btn-ai:active,.btn-wear:active,.e-back:active,.w-avatar:active{scale:.96}
+.nav-btn,.s-later{transition:opacity .15s ease}
+.nav-btn:active,.s-later:active,.arrow:active,.d-undo.on:active{opacity:.45}
+.t:active{opacity:.75}
+
+/* 编辑时隐藏换方案相关的东西 */
+.detail.editing .arrow,.detail.editing .d-cap,.detail.editing .d-strip,.detail.editing .d-actions{opacity:0;pointer-events:none}
+.arrow,.d-cap,.d-strip{transition:opacity .3s ease}
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+  <div class="status">
+    <span class="time">9:41</span>
+    <img class="icons" src="assets/status-icons.png" width="80" height="14.5" alt="">
+  </div>
+
+  <!-- 衣柜页（首页） -->
+  <section class="screen wardrobe" id="wardrobe">
+    <header class="w-head">
+      <div class="w-row1">
+        <button class="w-avatar" aria-label="我的"><img src="assets/avatar.webp" alt=""></button>
+        <span class="label g-meta" id="wMeta"></span>
+      </div>
+      <div class="w-title"><div class="w-en">Jean’s Wardrobe</div></div>
+    </header>
+    <div class="rack tops" id="rackTops"></div>
+    <div class="rack bottoms" id="rackBottoms"></div>
+    <div class="w-tray" id="wTray"></div>
+    <button class="w-ai" id="wAi" disabled></button>
+  </section>
+
+  <!-- 网格页 -->
+  <section class="screen" id="gridScreen">
+    <div class="grid" id="grid">
+      <div class="origin" id="origin"><div class="g-seed" id="gSeed"><img alt=""><div class="sweep"></div></div></div>
+      <div class="g-loading" id="gLoading"><span>Styling your looks</span></div>
+      <div class="g-name" id="gName">
+        <div class="g-en" id="gEn"></div>
+        <div class="g-cn" id="gCn"></div>
+      </div>
+    </div>
+
+    <header class="g-head">
+      <div class="g-row">
+        <button class="g-back nav-btn" id="gBack" aria-label="返回衣柜"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>衣柜</button>
+        <span class="g-meta label" id="gMeta"></span>
+      </div>
+      <div class="g-anchor">
+        <div class="thumb"><img id="anchorImg" alt=""></div>
+        <div>
+          <div class="g-k">styling around</div>
+          <div class="g-t" id="anchorName"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="g-progress" id="gProgress"></div>
+  </section>
+
+  <!-- 详情页 -->
+  <section class="screen detail" id="detail">
+    <div class="d-bg" id="dBg"></div>
+    <div class="d-top" id="dTop">
+      <button class="nav-btn" id="dBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>返回</button>
+      <span class="d-right">
+        <button class="nav-btn d-undo" id="dUndo"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-4"/></svg>撤回</button>
+        <span class="label d-count" id="dCount"></span>
+      </span>
+    </div>
+    <div class="d-title" id="dTitle">
+      <div class="d-en" id="dEn"></div>
+      <div class="d-cn" id="dCn"></div>
+    </div>
+    <div class="d-stage" id="dStage">
+      <div class="hero" id="hero"><img id="heroImg" alt=""></div>
+      <canvas class="lift" id="lift"></canvas>
+      <canvas class="fx" id="fx"></canvas>
+      <div class="pin" id="pin"></div>
+      <div class="gen-tip" id="genTip"></div>
+      <div class="ask" id="ask">
+        <input id="askInput" type="text" autocomplete="off">
+        <button id="askSend" aria-label="发送"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+      </div>
+      <button class="arrow prev" id="prev" aria-label="上一套"><svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg></button>
+      <button class="arrow next" id="next" aria-label="下一套"><svg viewBox="0 0 24 24"><path d="M9 4l8 8-8 8"/></svg></button>
+    </div>
+    <div class="d-cap" id="dCap">
+      <p class="d-reason" id="dReason"></p>
+    </div>
+    <div class="d-strip" id="dStrip"></div>
+    <div class="d-actions" id="dActions">
+      <button class="btn-ai" id="btnAi"><svg viewBox="0 0 24 24"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>问问 AI</button>
+      <button class="btn-wear" id="btnWear">就穿这套</button>
+    </div>
+
+    <!-- 仿 iOS 键盘：输入时从底部弹出 -->
+    <div class="kb" id="kb" aria-hidden="true">
+      <div class="kb-cand"><span>我</span><span>的</span><span>你</span><span>是</span><span>在</span><span>想</span><span>换</span></div>
+      <div class="kb-keys">
+        <div class="kb-row">q w e r t y u i o p</div>
+        <div class="kb-row">a s d f g h j k l</div>
+        <div class="kb-row" data-row="3">z x c v b n m</div>
+        <div class="kb-row" data-row="4"></div>
+      </div>
+      <div class="kb-bottom">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>
+        <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 结尾：今日穿搭卡片 -->
+  <section class="ending" id="ending">
+    <div class="card" id="card">
+      <div class="c-photo" id="cPhoto"></div>
+      <div class="c-info">
+        <div class="c-en" id="cEn"></div>
+        <div class="c-cn" id="cCn"></div>
+        <div class="c-meta"><span id="cDate"></span><span id="cWeather"></span></div>
+      </div>
+    </div>
+    <div class="e-saved">已保存到我的</div>
+    <button class="e-back" id="eBack"><svg viewBox="0 0 24 24"><path d="M12 6a2 2 0 1 1 2 2c-1 0-2 .6-2 1.6V10l-8 6h16l-8-6"/></svg>回到衣柜</button>
+  </section>
+
+  <!-- 开屏弹窗：AI 主动推荐一件很久没穿的 -->
+  <div class="sheet-wrap" id="sheetWrap">
+    <div class="scrim" id="scrim"></div>
+    <div class="sheet">
+      <div class="s-photo"><img src="assets/card/anchor-shirt.webp" alt=""></div>
+      <div class="s-title">你很久没穿这件了</div>
+      <div class="s-sub" id="sSub"></div>
+      <button class="w-ai" id="sGo"><svg viewBox="0 0 24 24"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>用这件生成搭配</button>
+      <button class="s-later" id="sLater">以后再说</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="island"></div>
+  <div class="home-ind"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="items.js"></script>
+<script src="hitmap.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+
+/* 嵌在展示页（stage.html）里时：背景透明，并把「现在走到第几步」告诉展示页 */
+const EMBED = window.parent !== window;
+if (EMBED) document.documentElement.classList.add("embed");
+function stage(n) { if (EMBED) parent.postMessage({ outfitStep: n }, "*"); }
+const pad = n => String(n).padStart(2, "0");
+
+$("gMeta").textContent = WEATHER;
+$("anchorImg").src = ANCHOR.img;
+$("anchorName").textContent = ANCHOR.cn;
+
+/* ============ 衣柜（首页）：衣服侧着挂，正中间那件转成正面 ============ */
+const wardrobe = $("wardrobe");
+$("wMeta").textContent = WEATHER;
+// 每件衣服图片的宽高比、最上沿（领口 / 裤腰）左右两端占图片宽度的比例（由图片量出来）
+const W_FIT = {"02142905": [1.056, 0.298, 0.7], "02893915": [0.958, 0.305, 0.695], "02903901": [0.646, 0.278, 0.726], "03085905": [1.002, 0.359, 0.64], "04344905": [0.659, 0.189, 0.819], "05755920": [0.929, 0.304, 0.684], "05854905": [0.468, 0.118, 0.882], "08012015": [0.907, 0.254, 0.798], "08013026": [0.548, 0.122, 0.878], "08014900": [0.509, 0.199, 0.857], "08015007": [0.563, 0.202, 0.793], "08016896": [0.469, 0.151, 0.876], "08018731": [0.661, 0.144, 0.853], "08019042": [0.757, 0.188, 0.825], "08021037": [0.829, 0.37, 0.617], "08022051": [0.632, 0.181, 0.869], "08037065": [0.649, 0.186, 0.816], "08039034": [0.55, 0.162, 0.864], "anchor-shirt": [0.942, 0.41, 0.573]};
+// 挂钩：钩子勾在挂杆上（圆心对准挂杆），坐标以钩子竖杆为 x=0
+const HOOK_PATH = "M0 8a3.5 3.5 0 0 1 7 0c0 1.4-.6 2.3-1.6 2.8";
+// 上衣：只露出钩子，肩膀那段藏在衣服里，像真实衣柜里看到的那样
+const hookTop = () => `<svg class="hook" width="20" height="30" viewBox="-10 0 20 30" style="margin-left:-10px"><path d="${HOOK_PATH}M0 8V28"/></svg>`;
+// 下装：钩子 + 一根横杆，两个夹子夹在裤腰两端
+function hookBottom(id, box) {
+  const [ar, l, r] = W_FIT[id];
+  const dw = Math.min(box[0], box[1] * ar);
+  const L = (l - .5) * dw, Rr = (r - .5) * dw, w = Math.ceil(Math.max(-L, Rr) + 6) * 2;
+  return `<svg class="hook" width="${w}" height="30" viewBox="${-w / 2} 0 ${w} 30" style="margin-left:${-w / 2}px">` +
+    `<path d="${HOOK_PATH}M0 8V21M${L - 3} 21H${Rr + 3}"/>` +
+    `<rect x="${L + 3}" y="19" width="4" height="9" rx="1"/><rect x="${Rr - 7}" y="19" width="4" height="9" rx="1"/></svg>`;
+}
+const picked = new Set();      // 选中「今天要穿」的单品
+
+function makeRack(el, kind, list, start, box) {
+  el.innerHTML = `<div class="rack-label">${kind === "tops" ? "Tops" : "Bottoms"}</div><div class="rod"></div><div class="rack-stage"></div>`;
+  const stage = el.querySelector(".rack-stage");
+  const hangs = list.map(it => {
+    const h = document.createElement("div");
+    h.className = "hang";
+    const cloth = `<div class="cloth" style="top:${kind === "tops" ? 14 : 16}px;width:${box[0]}px;height:${box[1]}px;margin-left:${-box[0] / 2}px"><img src="assets/wardrobe/${it.id}.webp" alt=""></div>`;
+    h.innerHTML = kind === "tops" ? hookTop() + cloth : cloth + hookBottom(it.id, box);   // 上衣钩子在衣服后面，下装夹子在裤腰前面
+    stage.appendChild(h);
+    return h;
+  });
+  const R = { el, list, hangs, offset: start, center: -1, raf: null };
+  const G = 122, S = 40;                    // 正中间那件和旁边的间距、侧挂衣服之间的间距
+  R.render = () => {
+    let best = 0, bd = 1e9;
+    hangs.forEach((h, i) => {
+      const d = i - R.offset, a = Math.abs(d), sg = Math.sign(d);
+      const x = sg * (a <= 1 ? a * G : G + (a - 1) * S);
+      const rot = -sg * Math.min(a, 1) * 68;              // 两侧最多转到 68°
+      const sc = a <= 1 ? 1 - .2 * a : .8 - Math.min(a - 1, 4) * .03;
+      const lift = picked.has(list[i].id) && a < .5 ? -6 : 0;
+      h.style.transform = `translateX(${x}px) translateY(${lift}px) rotateY(${rot}deg) scale(${sc})`;
+      h.style.zIndex = 100 - Math.round(a * 10);
+      h.style.filter = `brightness(${1 - Math.min(a, 3) * .07})`;
+      h.style.opacity = a > 5.5 ? 0 : 1;
+      h.classList.toggle("picked", picked.has(list[i].id));
+      if (a < bd) { bd = a; best = i; }
+    });
+    R.center = best;
+  };
+  R.snapTo = (i, v = 0) => {
+    cancelAnimationFrame(R.raf);
+    i = Math.max(0, Math.min(list.length - 1, i));
+    let vel = v, last = performance.now();
+    const K = 120, C = 2 * Math.sqrt(K);
+    const step = now => {
+      const dt = Math.min(.032, (now - last) / 1000); last = now;
+      vel += (-K * (R.offset - i) - C * vel) * dt;
+      R.offset += vel * dt;
+      if (Math.abs(R.offset - i) < .002 && Math.abs(vel) < .02) { R.offset = i; R.render(); return; }
+      R.render(); R.raf = requestAnimationFrame(step);
+    };
+    R.raf = requestAnimationFrame(step);
+  };
+  // 拖动：左右滑；轻点正中间那件 = 选中 / 取消；点旁边的 = 先转到中间
+  let dr = null;
+  el.addEventListener("pointerdown", e => {
+    cancelAnimationFrame(R.raf);
+    dr = { x: e.clientX, o: R.offset, moved: false, target: e.target, s: [{ x: e.clientX, t: performance.now() }] };
+    el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener("pointermove", e => {
+    if (!dr) return;
+    const dx = e.clientX - dr.x;
+    if (!dr.moved && Math.abs(dx) > 6) dr.moved = true;
+    if (!dr.moved) return;
+    let o = dr.o - dx / 70;
+    const max = list.length - 1;
+    if (o < 0) o *= .35; else if (o > max) o = max + (o - max) * .35;   // 到头时有一点阻力
+    R.offset = o;
+    const now = performance.now();
+    dr.s.push({ x: e.clientX, t: now });
+    while (dr.s.length > 2 && now - dr.s[0].t > 100) dr.s.shift();
+    R.render();
+  });
+  const end = () => {
+    if (!dr) return;
+    const d = dr; dr = null;
+    if (!d.moved) {
+      const hit = d.target.closest && d.target.closest(".hang");
+      const i = hit ? hangs.indexOf(hit) : R.center;
+      if (i === R.center) togglePick(R, list[i]); else R.snapTo(i);
+      return;
+    }
+    const a = d.s[0], b = d.s[d.s.length - 1];
+    const v = -(b.x - a.x) / Math.max(16, b.t - a.t) * 1000 / 70;   // 每秒滑过几件
+    R.snapTo(Math.round(R.offset + v * .18), v * .5);
+  };
+  el.addEventListener("pointerup", end);
+  el.addEventListener("pointercancel", end);
+  el.addEventListener("wheel", e => {
+    if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    cancelAnimationFrame(R.raf);
+    R.offset = Math.max(-.4, Math.min(list.length - .6, R.offset + e.deltaX / 70));
+    R.render();
+    clearTimeout(R.wt); R.wt = setTimeout(() => R.snapTo(Math.round(R.offset)), 140);
+  }, { passive: false });
+  R.render();
+  return R;
+}
+
+const racks = [
+  makeRack($("rackTops"), "tops", WARDROBE.tops, WARDROBE.start.tops, [168, 184]),
+  makeRack($("rackBottoms"), "bottoms", WARDROBE.bottoms, WARDROBE.start.bottoms, [146, 220]),
+];
+
+function togglePick(R, it) {
+  if (picked.has(it.id)) picked.delete(it.id); else picked.add(it.id);
+  racks.forEach(r => r.render());
+  const img = R.hangs[R.list.indexOf(it)].querySelector(".cloth");
+  img.animate([{ transform: "scale(1)" }, { transform: "scale(1.05)" }, { transform: "scale(1)" }], { duration: 320, easing: "ease-out" });
+  updateAi();
+  updateTray(it.id);
+}
+// 底部缩略图：已经选了哪几件（按选的先后排），最后永远留一个「＋」空位
+function updateTray(added) {
+  const all = [...WARDROBE.tops, ...WARDROBE.bottoms];
+  $("wTray").innerHTML = [...picked].map(id => `<div class="w-thumb" data-id="${id}"><img src="assets/wardrobe/${id}.webp" alt="${all.find(x => x.id === id).name}"></div>`).join("")
+    + `<div class="w-thumb empty"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>`;
+  const t = $("wTray").querySelector(`[data-id="${added}"]`);
+  if (t) t.animate([{ opacity: 0, transform: "scale(.6)" }, { opacity: 1, transform: "scale(1)" }], { duration: 260, easing: "cubic-bezier(.3,1.4,.6,1)" });
+}
+function updateAi() {
+  const n = picked.size, b = $("wAi");
+  b.disabled = n === 0;
+  b.innerHTML = n === 0 ? "点一件今天想穿的"
+    : `<svg viewBox="0 0 24 24"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg>${n === 1 ? "用这件生成搭配" : `用这 ${n} 件生成搭配`}`;
+}
+updateAi();
+updateTray();
+
+// 屏幕中间的提示：演示没覆盖到的操作，统一用它说明
+function toast(text, ms = 2400) {
+  const t = $("toast");
+  t.textContent = text; t.classList.add("on");
+  hintAgain();
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("on"), ms);
+}
+// 生成搭配：衣柜淡出，网格页开始 loading（演示只预设了「只选荷叶边衬衫」）
+function generate() {
+  startLoading();
+  wardrobe.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 380, easing: "ease-in", fill: "forwards" }).onfinish = () => {
+    wardrobe.style.display = "none";
+    wardrobe.getAnimations().forEach(a => a.cancel());
+  };
+}
+function openWardrobe() {
+  stage(2);
+  wardrobe.style.display = "";
+  wardrobe.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 380, easing: "ease-out" });
+}
+$("wAi").addEventListener("click", () => {
+  if (!(picked.size === 1 && picked.has("anchor-shirt"))) { toast("演示版本只预设了「只选荷叶边衬衫」"); return; }
+  generate();
+});
+document.querySelector(".w-avatar").addEventListener("click", () => toast("演示版本暂未包含「我的」页面"));
+
+/* ---- 开屏弹窗：打开 App 一会儿，AI 主动推荐一件很久没穿的 ---- */
+const sheetWrap = $("sheetWrap");
+$("sSub").textContent = `${ANCHOR.cn} · 今天用它搭一套？`;
+function openSheet() {
+  stage(1);
+  sheetWrap.classList.add("open");
+  sheetWrap.offsetWidth;
+  sheetWrap.classList.add("on");
+}
+function closeSheet() {
+  stage(2);
+  sheetWrap.classList.remove("on");
+  setTimeout(() => sheetWrap.classList.remove("open"), 500);
+}
+setTimeout(openSheet, 700);
+$("sLater").addEventListener("click", closeSheet);
+$("scrim").addEventListener("click", closeSheet);
+// 「用这件生成搭配」：弹窗收起 → 衣架上的衬衫被选中（缩略图出现）→ 等用户点底部按钮再开始生成
+$("sGo").addEventListener("click", () => {
+  closeSheet();
+  const R = racks[0], i = R.list.findIndex(x => x.id === "anchor-shirt");
+  picked.clear();
+  racks.forEach(r => r.render());
+  updateAi(); updateTray();
+  R.snapTo(i);
+  setTimeout(() => togglePick(R, R.list[i]), 420);
+});
+
+/* ============ 凸透镜网格 ============ */
+const COLS = 4, ROWS = 5;      // 4 列 × 5 行，上下左右无限循环
+const U = .8;                  // 透镜半径（单位：格）：越小，边缘缩得越快
+const AX = 185;                // 左右方向：方案最远能摆到离中心多远
+const AY_DOWN = 346;           // 往下：要多推一些，给模特脚下的名称让出位置
+const AY_UP = 284;
+const SX = AX / U, SY = 394;   // 手指拖动距离和格子的换算
+const START = DEMO.look;       // 一开始停在演示那一套（第 20 套）
+const grid = $("grid"), origin = $("origin");
+
+const cells = LOOKS.map((l, i) => {
+  const col = i % COLS, row = Math.floor(i / COLS);
+  const bx = (col - 1.5) * SX;
+  const by = ((row - 1.5) + (col % 2 ? .25 : -.25)) * SY;   // 奇数列错开半格
+  const el = document.createElement("div");
+  el.className = "look";
+  el.dataset.i = i;
+  el.innerHTML = `<img class="real" src="${l.img}" alt=""><img class="sil" src="${l.img}" alt="">`;
+  origin.appendChild(el);
+  return { el, bx, by };
+});
+
+/* 无限循环：把位置折回到中心附近的一圈里，拖到头会接上另一边 */
+const W = COLS * SX, H = ROWS * SY;
+const wrap = (v, p) => v - p * Math.round(v / p);
+const posOf = (c, o) => ({ x: wrap(c.bx + o.x, W), y: wrap(c.by + o.y, H) });
+const targetFor = (i, o) => { const q = posOf(cells[i], o); return { x: o.x - q.x, y: o.y - q.y }; };
+
+let off = targetFor(START, { x: 0, y: 0 });
+let focus = START;
+
+let bestPos = { x: 0, y: 0, s: 1, u: 0 };
+function render() {
+  let best = 0, bd = Infinity;
+  cells.forEach((c, i) => {
+    const q = posOf(c, off);
+    const vx = q.x / SX, vy = q.y / SY;                  // 离中心几格
+    const u = Math.hypot(vx, vy);
+    const r = u * SX;
+    const s = 1 / (1 + (u / U) ** 2);                    // 离中心越远越小
+    const g = u > .001 ? Math.atan(u / U) / u : 1 / U;   // 位置也往中心压，像贴在球面上
+    const x = AX * g * vx, y = (vy > 0 ? AY_DOWN : AY_UP) * g * vy;
+    // Loading 出场：k 从 0 到 1，方案从中央散到自己的位置
+    const k = c.k == null ? 1 : c.k, e = 1 - (1 - k) ** 3;
+    c.el.style.transform = `translate(${x * e}px,${y * e}px) scale(${1 + (s - 1) * e})`;
+    const o = Math.min(1, Math.max(0, (s - .15) / .2)) * Math.min(1, k * 3);  // 循环接缝处完全隐藏
+    c.el.style.opacity = o;
+    c.el.style.visibility = o < .02 ? "hidden" : "";
+    c.el.style.zIndex = Math.round(s * 1000);
+    if (r < bd) { bd = r; best = i; bestPos = { x, y, s, u }; }
+  });
+  focus = best;
+  renderName();
+}
+
+/* 名称跟手：挂在离中心最近那套的脚下，越靠近中心越清楚，拖过去时一闪而过 */
+const gName = $("gName");
+// 位置决定「该不该显示」，显示的过程有自己的节奏：浮现慢（约 0.5 秒），消失快（约 0.15 秒）
+let nameOff = false, nameIdx = -1, nameOp = 0, nameTarget = 0, nameRaf = null, nameLast = 0;
+function applyName() {
+  const { x, y, s } = bestPos;
+  gName.style.opacity = nameOp;
+  gName.style.transform = `translate(${x}px,${y + 184 * (s - 1) + (1 - nameOp) * 6}px)`;
+}
+function tickName(now) {
+  const dt = Math.min(.05, (now - nameLast) / 1000); nameLast = now;
+  const tau = nameTarget > nameOp ? .17 : .05;
+  nameOp += (nameTarget - nameOp) * (1 - Math.exp(-dt / tau));
+  if (Math.abs(nameTarget - nameOp) < .01) nameOp = nameTarget;
+  applyName();
+  nameRaf = nameOp === nameTarget ? null : requestAnimationFrame(tickName);
+}
+function renderName() {
+  if (nameIdx !== focus) {          // 换到另一套：新名字从 0 开始重新浮现
+    nameIdx = focus;
+    nameOp = 0;
+    const p = isPending(focus);      // 还没做好的：名称处显示「正在生成 OOTD…」
+    $("gEn").textContent = p ? "" : LOOKS[focus].en;
+    $("gCn").textContent = p ? "正在生成 OOTD…" : LOOKS[focus].cn;
+  }
+  nameTarget = nameOff ? 0 : Math.max(0, Math.min(1, 1 - (bestPos.u - .08) / .25));
+  applyName();
+  if (!nameRaf && nameOp !== nameTarget) { nameLast = performance.now(); nameRaf = requestAnimationFrame(tickName); }
+}
+function showName() { nameOff = false; renderName(); }
+function hideName() { nameOff = true; renderName(); }
+
+/* 弹簧动画：放手后吸附到最近一套 */
+let raf = null;
+function stopAnim() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+function animateTo(t, v = { x: 0, y: 0 }, done) {
+  stopAnim();
+  let vx = v.x, vy = v.y, last = performance.now();
+  const K = 140, C = 2 * Math.sqrt(K);
+  const step = now => {
+    const dt = Math.min(.032, (now - last) / 1000); last = now;
+    vx += (-K * (off.x - t.x) - C * vx) * dt;
+    vy += (-K * (off.y - t.y) - C * vy) * dt;
+    off.x += vx * dt; off.y += vy * dt;
+    if (Math.hypot(off.x - t.x, off.y - t.y) < .3 && Math.hypot(vx, vy) < 5) {
+      off.x = t.x; off.y = t.y; render(); raf = null; done && done(); return;
+    }
+    render();
+    raf = requestAnimationFrame(step);
+  };
+  raf = requestAnimationFrame(step);
+}
+function nearestTo(p) {
+  let best = 0, bd = Infinity;
+  cells.forEach((c, i) => { const q = posOf(c, p); const d = Math.hypot(q.x, q.y); if (d < bd) { bd = d; best = i; } });
+  return best;
+}
+function snapTo(i, v) { animateTo(targetFor(i, off), v, showName); }
+
+/* 点击判断：看点到的是哪一套（只算模特本身附近，不算图片的白边） */
+function lookAt(x, y) {
+  let hit = -1, bestZ = -1;
+  cells.forEach((c, i) => {
+    if (c.el.style.visibility === "hidden") return;
+    const r = c.el.getBoundingClientRect();
+    const cx = r.left + r.width / 2, w = r.width * .32;
+    if (x > cx - w && x < cx + w && y > r.top + r.height * .03 && y < r.bottom - r.height * .03) {
+      const z = +c.el.style.zIndex;
+      if (z > bestZ) { bestZ = z; hit = i; }
+    }
+  });
+  return hit;
+}
+
+let drag = null;
+grid.addEventListener("pointerdown", e => {
+  if (busy) return;
+  stopAnim();
+  const now = performance.now();
+  drag = { sx: e.clientX, sy: e.clientY, ox: off.x, oy: off.y, moved: false, samples: [{ x: e.clientX, y: e.clientY, t: now }] };
+  grid.setPointerCapture(e.pointerId);
+});
+grid.addEventListener("pointermove", e => {
+  if (!drag) return;
+  const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+  if (!drag.moved && Math.hypot(dx, dy) > 6) { drag.moved = true; grid.classList.add("dragging"); }
+  if (!drag.moved) return;
+  off.x = drag.ox + dx;
+  off.y = drag.oy + dy;
+  const now = performance.now();
+  drag.samples.push({ x: e.clientX, y: e.clientY, t: now });
+  while (drag.samples.length > 2 && now - drag.samples[0].t > 100) drag.samples.shift();
+  render();
+});
+function endDrag(e) {
+  if (!drag) return;
+  const d = drag; drag = null;
+  grid.classList.remove("dragging");
+  if (!d.moved) {
+    const i = lookAt(d.sx, d.sy);
+    if (i < 0) { snapTo(focus); return; }
+    if (i === focus) {
+      if (isPending(i)) gName.animate([{ opacity: .3 }, { opacity: nameOp }], { duration: 400, easing: "ease-out" });
+      else if (i !== DEMO.look) { toast(`演示版本只预设了「${LOOKS[DEMO.look].cn}」`); snapTo(DEMO.look); }   // 演示只开放这一套：转回它
+      else openDetail(i);
+    } else snapTo(i);
+    return;
+  }
+  const a = d.samples[0], b = d.samples[d.samples.length - 1];
+  const dt = Math.max(16, b.t - a.t) / 1000;
+  let vx = (b.x - a.x) / dt, vy = (b.y - a.y) / dt;
+  const sp = Math.hypot(vx, vy), max = 2200;
+  if (sp > max) { vx *= max / sp; vy *= max / sp; }
+  const proj = { x: off.x + vx * .2, y: off.y + vy * .2 };
+  animateTo(targetFor(nearestTo(proj), proj), { x: vx * .5, y: vy * .5 }, showName);
+}
+grid.addEventListener("pointerup", endDrag);
+grid.addEventListener("pointercancel", endDrag);
+
+/* 触控板 / 滚轮也能拖 */
+let wheelTimer = null;
+grid.addEventListener("wheel", e => {
+  e.preventDefault();
+  if (busy) return;
+  stopAnim();
+  off.x -= e.deltaX;
+  off.y -= e.deltaY;
+  render();
+  clearTimeout(wheelTimer);
+  wheelTimer = setTimeout(() => snapTo(nearestTo(off)), 140);
+}, { passive: false });
+
+render();
+
+/* ============ Loading：文字呼吸 → 灰色剪影从中央散开 → 中心和第一圈先「穿上」，其余陆续 ============ */
+const gLoading = $("gLoading");
+let loading = false, loadTimers = [], introRaf = null;
+function isPending(i) { return cells[i].el.classList.contains("pending"); }   // 函数声明：首屏 render() 时就要用到
+function later(fn, ms) { loadTimers.push(setTimeout(fn, ms)); }
+function stopLoading() {
+  loadTimers.forEach(clearTimeout); loadTimers = [];
+  $("gProgress").classList.remove("on");
+  $("gSeed").classList.remove("on");
+  cancelAnimationFrame(introRaf);
+  loading = false;
+}
+function startLoading() {
+  stage(3);
+  stopLoading();
+  resetEdits();
+  loading = true; busy = true;                  // 文字阶段还不能拖
+  stopAnim();
+  off = targetFor(START, { x: 0, y: 0 });
+  cells.forEach(c => { c.k = 0; c.el.classList.add("pending"); c.el.style.visibility = ""; });
+  hideName(); nameIdx = -1;
+  render();
+  const seed = $("gSeed"), seedSrc = LOOKS[START].img;
+  seed.querySelector("img").src = seedSrc;
+  const sw = seed.querySelector(".sweep");
+  sw.style.webkitMaskImage = sw.style.maskImage = `url(${seedSrc})`;
+  seed.classList.add("on");
+  gLoading.classList.add("on");
+  // 按离中心的远近排队
+  const dist = i => { const q = posOf(cells[i], off); return Math.hypot(q.x / SX, q.y / SY); };
+  const order = cells.map((c, i) => i).sort((a, b) => dist(a) - dist(b));
+  // 时间线（放慢，四个阶段都看得清）：
+  // ① 0–2.6 秒：什么都没有，只有文字在呼吸
+  // ② 2.6 秒起：灰色剪影从中央一个个散开，全部还在搭配中
+  // ③ 5.5 秒起：中心和第一圈（6 套）一套套「穿上」；之后停一下，边缘仍是剪影，滑过去能看到还在生成
+  // ④ 约 21 秒：全部完成，底部提示「20 套都搭好了」
+  later(() => {
+    gLoading.classList.remove("on");
+    seed.classList.remove("on");
+    const t0 = performance.now();
+    order.forEach((i, n) => { cells[i].t0 = t0 + n * 60; });
+    const step = now => {
+      let all = true;
+      cells.forEach(c => { c.k = Math.min(1, Math.max(0, (now - c.t0) / 900)); if (c.k < 1) all = false; });
+      render();
+      introRaf = all ? null : requestAnimationFrame(step);
+    };
+    introRaf = requestAnimationFrame(step);
+    busy = false;                               // 散开时就可以拖了
+    setProgress(0);
+  }, 2600);
+  later(showName, 3400);                       // 中心剪影下面显示「正在生成 OOTD…」
+  const times = order.map((i, n) => n < 6 ? 5500 + n * 700 : 10500 + (n - 6) * 800);
+  order.forEach((i, n) => later(() => { markReady(i); setProgress(n + 1); }, times[n]));
+  const doneAt = times[times.length - 1];
+  later(() => { loading = false; }, doneAt + 100);
+}
+function markReady(i) {
+  cells[i].el.classList.remove("pending");
+  if (i === focus) { nameIdx = -1; renderName(); }
+}
+// 底部进度：正在搭配 6 / 20 → 20 套都搭好了（停 2.4 秒后淡出）
+const gProgress = $("gProgress");
+function setProgress(n) {
+  clearTimeout(gProgress._t);
+  if (n < cells.length) {
+    gProgress.innerHTML = `正在生成 OOTD <b>${n}</b> / ${cells.length}<i></i><i></i><i></i>`;
+  } else {
+    gProgress.innerHTML = `<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>${cells.length} 套都搭好了`;
+    gProgress._t = setTimeout(() => gProgress.classList.remove("on"), 2400);
+    if (!detail.classList.contains("open")) stage(4);
+  }
+  gProgress.classList.add("on");
+}
+// 重新生成：之前改过的那套恢复原样
+function resetEdits() {
+  Object.keys(edited).forEach(i => {
+    Object.assign(LOOKS[i], edited[i]);
+    cells[i].el.querySelector(".real").src = LOOKS[i].img;
+    thumbs[i].querySelector("img").src = LOOKS[i].thumb;
+    delete edited[i];
+  });
+}
+
+/* ============ 详情页 ============ */
+const detail = $("detail"), hero = $("hero"), heroImg = $("heroImg"), strip = $("dStrip");
+let cur = 0, busy = false;
+const fadeEls = () => [$("dBg"), $("dTop"), $("dTitle"), $("prev"), $("next"), $("dCap"), strip, $("dActions")];
+
+strip.innerHTML = LOOKS.map((l, i) => `<button class="t" data-i="${i}" aria-label="LOOK ${pad(i + 1)}"><img src="${l.thumb}" alt=""></button>`).join("");
+const thumbs = [...strip.children];
+
+function fillDetail(i, smooth) {
+  cur = i;
+  heroImg.src = LOOKS[i].img;
+  $("dCount").textContent = `${pad(i + 1)} / ${LOOKS.length}`;
+  $("dEn").textContent = LOOKS[i].en;
+  $("dCn").textContent = LOOKS[i].cn;
+  $("dReason").textContent = LOOKS[i].reason;
+  if (typeof refreshUndo === "function") refreshUndo();
+  thumbs.forEach((t, n) => t.classList.toggle("on", n === i));
+  const t = thumbs[i];
+  strip.scrollTo({ left: t.offsetLeft - strip.clientWidth / 2 + t.offsetWidth / 2, behavior: smooth ? "smooth" : "auto" });
+}
+
+function flip(from, to) {
+  const s = from.width / to.width;
+  const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+  const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+  return `translate(${dx}px,${dy}px) scale(${s})`;
+}
+
+function openDetail(i) {
+  if (busy) return; busy = true;
+  stage(5);
+  stopAnim(); hideName();
+  detail.classList.add("open");
+  fillDetail(i, false);
+  const card = cells[i].el;
+  const from = card.getBoundingClientRect(), to = hero.getBoundingClientRect();
+  card.style.visibility = "hidden";
+  hero.animate([{ transform: flip(from, to) }, { transform: "none" }], { duration: 620, easing: "cubic-bezier(.2,.8,.2,1)" })
+    .onfinish = () => { busy = false; };
+  // 动画重点在方案本身放大；周围的信息在放大到一半时，同时在原地渐显
+  fadeEls().forEach((el, n) => el.animate([{ opacity: 0 }, { opacity: 1 }],
+    { duration: n === 0 ? 360 : 480, delay: n === 0 ? 0 : 280, easing: "ease-out", fill: "backwards" }));
+}
+
+function closeDetail() {
+  if (busy) return; busy = true;
+  // 在详情页换过方案的话，网格直接对准这一套；没换过就停在原位
+  if (cur !== focus) { off = targetFor(cur, off); render(); }
+  render();
+  const card = cells[cur].el;
+  card.style.visibility = "hidden";
+  const to = card.getBoundingClientRect(), from = hero.getBoundingClientRect();
+  const outs = fadeEls();
+  outs.forEach((el, n) => el.animate([{ opacity: 1 }, { opacity: 0 }],
+    { duration: n === 0 ? 420 : 200, delay: n === 0 ? 120 : 0, easing: "ease-in", fill: "forwards" }));
+  hero.animate([{ transform: "none" }, { transform: flip(to, from) }], { duration: 520, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" })
+    .onfinish = () => {
+      card.style.visibility = "";
+      detail.classList.remove("open");
+      hero.getAnimations().forEach(a => a.cancel());
+      outs.forEach(el => el.getAnimations().forEach(a => a.cancel()));
+      busy = false;
+      showName();
+      stage(loading ? 3 : 4);
+    };
+}
+$("dBack").addEventListener("click", () => { if (generating) return; editing ? closeEdit() : closeDetail(); });
+
+/* 换方案：旧的先快速淡出，再让新的淡入。两者不重叠，避免残影 */
+let switching = false;
+function go(i, dir) {
+  if (i === cur || busy || switching) return;
+  if (isPending(i)) { toast("这一套正在生成 OOTD…"); return; }
+  dir = dir || (i > cur ? 1 : -1);
+  switching = true;
+  const ghost = hero.cloneNode(true);
+  ghost.removeAttribute("id");
+  ghost.querySelector("img").removeAttribute("id");
+  ghost.style.pointerEvents = "none";
+  $("dStage").insertBefore(ghost, hero);
+  ghost.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: `translateX(${-dir * 16}px)` }],
+    { duration: 160, easing: "ease-in", fill: "forwards" }).onfinish = () => ghost.remove();
+  fillDetail(i, true);
+  hero.animate([{ opacity: 0, transform: `translateX(${dir * 16}px)` }, { opacity: 1, transform: "none" }],
+    { duration: 360, delay: 160, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" })
+    .onfinish = () => { switching = false; };
+  [$("dEn"), $("dCn"), $("dReason")].forEach((el, n) => el.animate(
+    [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }],
+    { duration: 360, delay: 160, easing: "ease-out", fill: "backwards" }));
+}
+// 首尾相接：最后一套点「下一套」回到第一套，第一套点「上一套」到最后一套
+const N = LOOKS.length;
+$("prev").addEventListener("click", () => go((cur - 1 + N) % N, -1));
+$("next").addEventListener("click", () => go((cur + 1) % N, 1));
+strip.addEventListener("click", e => { const t = e.target.closest(".t"); if (t) go(+t.dataset.i); });
+
+/* ============ 精修：点模特身上的单品，旁边浮出一条输入框 ============ */
+const ask = $("ask"), askInput = $("askInput"), dStage = $("dStage"), pin = $("pin");
+let editing = null;     // 当前选中的单品
+
+// 没输入时显示的浅色引导 prompt，跟着点的单品变；不输入直接发送就用它
+function suggestFor(it) {
+  if (it.cat === "look") return "今天要见客户，调得正式一点";     // 问问 AI：改整体
+  if (it.cat === "top") return "加一件外套试试";
+  if (it.cat === "bag") return "换一只包试试";
+  if (it.cat === "outer") return "换一件短一点的外套";
+  if (it.cat === "bottom") return /裙/.test(it.name) ? "把裙子换成裤子" : "把裤子换成裙子";
+  return /靴/.test(it.name) ? "换成高跟鞋试试" : "换成靴子试试";
+}
+
+// 点到的是哪一件：先查「点击地图」（按轮廓逐像素判断，包和大衣下摆都准）
+const HIT = HIT_MAPS.map(m => m.split(",").map(t => t[0].repeat(+t.slice(1))).join(""));
+const HIT_CAT = { t: "top", o: "outer", b: "bottom", s: "shoes", g: "bag" };
+function itemAt(fx, fy) {
+  const map = HIT[cur];
+  if (map) {
+    const gx = Math.floor(fx * HIT_W), gy = Math.floor(fy * HIT_H);
+    // 点在衣服边缘的空隙上时，往周围 2 格找最近的
+    for (let r = 0; r <= 2; r++) {
+      for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+        const x = gx + dx, y = gy + dy;
+        if (x < 0 || y < 0 || x >= HIT_W || y >= HIT_H) continue;
+        const c = map[y * HIT_W + x];
+        if (c !== ".") {
+          const it = LOOK_ITEMS[cur].find(o => o.cat === HIT_CAT[c]);
+          if (it) return it;
+        }
+      }
+    }
+    return null;
+  }
+  return itemAtBox(fx, fy);
+}
+// 备用：按方框判断，在所有包含这个点的范围里，选面积最小的那一个
+function itemAtBox(fx, fy) {
+  let hit = null, area = Infinity;
+  LOOK_ITEMS[cur].forEach(it => {
+    const [x0, y0, x1, y1] = it.box;
+    if (fx >= x0 && fx <= x1 && fy >= y0 && fy <= y1) {
+      const a = (x1 - x0) * (y1 - y0);
+      if (a < area) { area = a; hit = it; }
+    }
+  });
+  return hit;
+}
+
+/* ---- 扫光（画布）：一道光贴着单品轮廓从上往下扫过。留给「生成中」用 ---- */
+const fx = $("fx"), fctx = fx.getContext("2d");
+const DPR = Math.min(2, window.devicePixelRatio || 1);
+fx.width = 360 * DPR; fx.height = 480 * DPR;
+const off1 = document.createElement("canvas"), o1 = off1.getContext("2d");
+off1.width = fx.width; off1.height = fx.height;
+const imgCache = {};
+function loadImg(src) {
+  if (!imgCache[src]) { const im = new Image(); im.src = src; imgCache[src] = im; }
+  return imgCache[src];
+}
+let fxState = null, fxRaf = null;
+
+function drawLayer(img, paint) {        // 只在图片（轮廓）不透明的地方上色
+  o1.globalCompositeOperation = "source-over";
+  o1.clearRect(0, 0, off1.width, off1.height);
+  o1.drawImage(img, 0, 0, off1.width, off1.height);
+  o1.globalCompositeOperation = "source-in";
+  paint(o1);
+  fctx.drawImage(off1, 0, 0);
+}
+
+function fxFrame(now) {
+  fctx.clearRect(0, 0, fx.width, fx.height);
+  const layers = fxState ? [fxState] : [];
+  if (fxPrev) layers.unshift(fxPrev);
+  let alive = false;
+  layers.forEach(st => {
+    const t = (now - st.t0) / 1000;
+    const fade = st.out ? Math.max(0, 1 - (now - st.tOut) / 220) : Math.min(1, t / .25);
+    if (st.out && fade <= 0) return;
+    if (t > 1.2 && !st.out && !st.loop) return;
+    alive = true;
+    if (!st.mask.complete) return;
+    // 光：一条柔和的亮带从上往下扫过（约 0.9 秒）；生成中会一遍遍地扫
+    const sweep = st.loop ? (t % 1.8) / 1.6 : t / .9;   // 生成中：每 1.8 秒扫一遍
+    if (sweep < 1.2) {
+      const y = (-.25 + sweep * 1.5) * fx.height;
+      drawLayer(st.mask, c => {
+        const g = c.createLinearGradient(0, y - fx.height * .16, 0, y + fx.height * .16);
+        g.addColorStop(0, "rgba(214,224,255,0)");
+        g.addColorStop(.5, `rgba(226,233,255,${.62 * fade})`);
+        g.addColorStop(1, "rgba(214,224,255,0)");
+        c.fillStyle = g; c.fillRect(0, 0, off1.width, off1.height);
+      });
+    }
+  });
+  if (fxPrev && fxPrev.out && now - fxPrev.tOut > 220) fxPrev = null;
+  fxRaf = alive ? requestAnimationFrame(fxFrame) : null;
+}
+let fxPrev = null;
+function fxSelect(it, loop) {
+  if (fxState) { fxState.out = true; fxState.tOut = performance.now(); fxPrev = fxState; }
+  fxState = it ? {
+    // 改整体时，光扫过整个模特（直接用抠好的模特图当轮廓）
+    mask: loadImg(it.cat === "look" ? LOOKS[cur].img : `assets/masks/look-${pad(cur + 1)}-${it.cat}.png`),
+    t0: performance.now(), loop: !!loop,
+  } : null;
+  if (!fxRaf) fxRaf = requestAnimationFrame(fxFrame);
+}
+
+/* ---- 选中态：这件衣服在原地轻轻放大 + 边缘下方一层柔和的阴影（只在演示的第 20 套，用的是干净的轮廓图） ---- */
+const liftCv = $("lift"), lctx = liftCv.getContext("2d");
+liftCv.width = 360 * DPR; liftCv.height = 480 * DPR;
+const off2 = document.createElement("canvas"), o2 = off2.getContext("2d");
+off2.width = liftCv.width; off2.height = liftCv.height;
+let liftTimer = null, liftRaf = null;
+const LIFT_SCALE = 1.02, LIFT_MS = 250;
+
+// 在画布里一次画好（不再用 CSS 放大，避免变糊）：s = 放大倍数，a = 阴影深浅（0–1）
+function drawLift(mask, cx, cy, s, a) {
+  const Wc = liftCv.width, Hc = liftCv.height, k = Wc / 360;
+  const at = (c, dy = 0) => c.setTransform(s, 0, 0, s, cx * (1 - s), cy * (1 - s) + dy);
+  lctx.setTransform(1, 0, 0, 1, 0, 0);
+  lctx.clearRect(0, 0, Wc, Hc);
+  // 阴影：放大后的轮廓往下偏一点、模糊，再按放大后的轮廓抠掉（边缘才对得上）
+  o2.setTransform(1, 0, 0, 1, 0, 0);
+  o2.globalCompositeOperation = "source-over";
+  o2.clearRect(0, 0, Wc, Hc);
+  o2.filter = `blur(${9 * k}px)`;
+  at(o2, 6 * k); o2.drawImage(mask, 0, 0, Wc, Hc);
+  o2.filter = "none";
+  o2.setTransform(1, 0, 0, 1, 0, 0);
+  o2.globalCompositeOperation = "source-in";
+  o2.fillStyle = `rgba(20,16,14,${.6 * a})`; o2.fillRect(0, 0, Wc, Hc);
+  o2.globalCompositeOperation = "destination-out";
+  at(o2); o2.drawImage(mask, 0, 0, Wc, Hc);
+  lctx.drawImage(off2, 0, 0);
+  // 衣服本身：按原图分辨率放大一次画上去（颜色不变）
+  o2.setTransform(1, 0, 0, 1, 0, 0);
+  o2.globalCompositeOperation = "source-over";
+  o2.clearRect(0, 0, Wc, Hc);
+  at(o2); o2.drawImage(mask, 0, 0, Wc, Hc);
+  o2.globalCompositeOperation = "source-in";
+  at(o2); o2.drawImage(heroImg, 0, 0, Wc, Hc);
+  o2.setTransform(1, 0, 0, 1, 0, 0);
+  lctx.drawImage(off2, 0, 0);
+}
+
+function liftSelect(it) {
+  clearTimeout(liftTimer);
+  cancelAnimationFrame(liftRaf);
+  const wasOn = liftCv.classList.contains("on");
+  liftCv.classList.remove("on");
+  if (!it || it.cat === "look" || cur !== DEMO.look || edited[cur]) return;
+  const mask = loadImg(`assets/masks/look-${pad(cur + 1)}-${it.cat}.png`);
+  const [x0, y0, x1, y1] = it.box;
+  const cx = (x0 + x1) / 2 * liftCv.width, cy = (y0 + y1) / 2 * liftCv.height;
+  const start = () => {
+    liftCv.classList.add("on");
+    const t0 = performance.now();
+    const step = now => {
+      const k = Math.min(1, (now - t0) / LIFT_MS), e = 1 - (1 - k) ** 3;   // 先快后慢
+      drawLift(mask, cx, cy, 1 + (LIFT_SCALE - 1) * e, e);
+      if (k < 1) liftRaf = requestAnimationFrame(step);
+    };
+    liftRaf = requestAnimationFrame(step);
+  };
+  // 换选另一件时，旧的先淡掉，再让新的放大
+  liftTimer = setTimeout(() => (mask.complete ? start() : (mask.onload = start)), wasOn ? 160 : 0);
+}
+
+/* ---- 输入框：永远贴在黑点的右下角，紧挨着手指 ---- */
+function placeAsk(px, py) {          // px, py：点击位置（相对舞台）
+  if (editing && editing.cat === "look") {   // 问问 AI：输入框贴在键盘上方、居中，不指向任何单品
+    const stageW = dStage.offsetWidth, w = Math.min(320, stageW - 32);
+    const top = detail.offsetHeight - kb.offsetHeight - 12 - 42 - dStage.offsetTop;
+    Object.assign(ask.style, { left: (stageW - w) / 2 + "px", top: top + "px", width: w + "px" });
+    return;
+  }
+  Object.assign(pin.style, { left: px + "px", top: py + "px" });
+  const stageW = dStage.offsetWidth, gap = 8, edge = 12, minW = 140;
+  const room = stageW - edge - (px + gap);                   // 黑点右边还剩多少空间
+  const want = Math.min(262, measure(askInput.value || askInput.placeholder) + 66);
+  const w = Math.max(minW, Math.min(want, room));
+  const left = Math.min(px + gap, stageW - edge - w);         // 实在放不下才往左挪刚好够的距离
+  Object.assign(ask.style, { left: left + "px", top: py + gap + "px", width: w + "px" });
+}
+const mctx = document.createElement("canvas").getContext("2d");
+function measure(t) { mctx.font = '300 13px "Noto Sans SC"'; return mctx.measureText(t).width; }
+let lastTap = { x: 0, y: 0 };
+
+function openEdit(it, px, py) {
+  const first = !editing;
+  stage(6);
+  editing = it;
+  lastTap = { x: px, y: py };
+  detail.classList.add("editing");
+  askInput.value = "";
+  askInput.placeholder = suggestFor(it);
+  if (first) {
+    ask.style.transition = pin.style.transition = "none";
+    placeAsk(px, py); ask.offsetWidth;
+    ask.style.transition = pin.style.transition = "";
+  } else placeAsk(px, py);
+  ask.classList.add("on");
+  pin.classList.toggle("on", it.cat !== "look");
+  liftSelect(it);
+  // 选中态只靠小黑点和输入框；扫光留到「生成中」再用（fxSelect）
+  setTimeout(() => askInput.focus({ preventScroll: true }), first ? 200 : 0);
+  if (first) setTimeout(() => showKeyboard(true), 120); else liftForKeyboard();
+}
+
+function closeEdit() {
+  if (!editing || generating) return;
+  stage(5);
+  editing = null;
+  detail.classList.remove("editing");
+  ask.classList.remove("on");
+  pin.classList.remove("on");
+  liftSelect(null);
+  askInput.blur();
+  showKeyboard(false);
+  fxSelect(null);
+}
+
+/* ---- 仿 iOS 键盘 ---- */
+const kb = $("kb");
+document.querySelectorAll(".kb-row").forEach(row => {
+  if (row.dataset.row === "4") {
+    row.innerHTML = `<div class="key fn wide">123</div><div class="key fn wide"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9 10h.01M15 10h.01M8.5 14a4.5 4.5 0 0 0 7 0"/></svg></div><div class="key space" data-code="Space">空格</div><div class="key ret" data-code="Enter">发送</div>`;
+    return;
+  }
+  const keys = row.textContent.trim().split(/\s+/).map(k => `<div class="key" data-code="Key${k.toUpperCase()}">${k}</div>`).join("");
+  row.innerHTML = row.dataset.row === "3"
+    ? `<div class="key fn wide"><svg viewBox="0 0 24 24"><path d="M12 4 4 12h4.5v7h7v-7H20z"/></svg></div>${keys}<div class="key fn wide" data-code="Backspace"><svg viewBox="0 0 24 24"><path d="M9 5h11v14H9l-6-7z"/><path d="m12 9 5 6M17 9l-5 6"/></svg></div>`
+    : keys;
+});
+// 在电脑键盘上打字时，虚拟键盘对应的键亮一下（录屏时像在手机上打字）
+function pressKey(code) {
+  const k = kb.querySelector(`[data-code="${code}"]`);
+  if (!k) return;
+  k.classList.add("down");
+  setTimeout(() => k.classList.remove("down"), 110);
+}
+askInput.addEventListener("keydown", e => pressKey(e.code));
+kb.addEventListener("pointerdown", e => {
+  const k = e.target.closest(".key"); if (!k) return;
+  e.preventDefault();                       // 不让输入框失去焦点
+  k.classList.add("down"); setTimeout(() => k.classList.remove("down"), 110);
+  if (k.dataset.code === "Enter") send();
+});
+const KB_GAP = 12;
+function showKeyboard(on) {
+  kb.classList.toggle("on", on);
+  liftForKeyboard();
+}
+// 键盘弹出时，如果输入框会被挡住，就把模特、黑点和输入框一起往上推
+function liftForKeyboard() {
+  const on = kb.classList.contains("on");
+  let lift = 0;
+  if (on) {
+    const kbTop = detail.offsetHeight - kb.offsetHeight;
+    const askBottom = dStage.offsetTop + parseFloat(ask.style.top || 0) + ask.offsetHeight;
+    lift = Math.max(0, askBottom + KB_GAP - kbTop);
+  }
+  dStage.style.transform = lift ? `translateY(${-lift}px)` : "";
+  detail.classList.toggle("kb-up", lift > 0);
+}
+
+// 打字时输入框跟着变长（最长约 260px）
+askInput.addEventListener("input", () => placeAsk(lastTap.x, lastTap.y));
+
+// 点模特：定位到单品（拖动不算点击）
+let tapStart = null;
+hero.addEventListener("pointerdown", e => { tapStart = { x: e.clientX, y: e.clientY }; });
+hero.addEventListener("pointerup", e => {
+  if (!tapStart || busy || switching || generating) return;
+  const moved = Math.hypot(e.clientX - tapStart.x, e.clientY - tapStart.y) > 8;
+  tapStart = null;
+  if (moved) return;
+  const r = hero.getBoundingClientRect(), sr = dStage.getBoundingClientRect();
+  const it = itemAt((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+  if (it) openEdit(it, e.clientX - sr.left, e.clientY - sr.top);
+  else closeEdit();
+});
+// 点模特和输入框以外的地方：关闭
+dStage.addEventListener("pointerup", e => { if (editing && !hero.contains(e.target) && !ask.contains(e.target)) closeEdit(); });
+askInput.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeEdit();
+  if (e.key === "Enter") send();
+});
+
+/* ---- 发送 → 生成中（扫光）→ 换成新图 → 可以撤回 ---- */
+let generating = false;
+const edited = {};                  // 改过的套装：{ 套装序号: 改之前的样子 }
+const genTip = $("genTip");
+
+function showTip(html) {
+  genTip.innerHTML = html;
+  const left = Math.max(12, Math.min(lastTap.x + 10, dStage.offsetWidth - genTip.offsetWidth - 12));
+  Object.assign(genTip.style, { left: left + "px", top: lastTap.y - 34 + "px" });
+  genTip.classList.add("on");
+}
+
+// 换图：一条柔和的分界线从腰部往下「擦」过去，线上方是新图、下方还是旧图。
+// 两张图上半身完全一样，所以只有下装那里看得出变化，像裤子被一点点换成了裙子
+function swapLook(i, data) {
+  const L = LOOKS[i];
+  Object.assign(L, data);
+  cells[i].el.querySelector(".real").src = L.img;
+  thumbs[i].querySelector("img").src = L.thumb;
+  if (i !== cur) return;
+  const next = new Image();
+  next.className = "next-img"; next.src = L.img; next.alt = "";
+  const setMask = (el, css) => { el.style.webkitMaskImage = css; el.style.maskImage = css; };
+  const from = 30, to = 108, soft = 7, dur = 1100;
+  const run = () => {
+    hero.appendChild(next);
+    const t0 = performance.now();
+    const step = now => {
+      const k = Math.min(1, (now - t0) / dur);
+      const e = k < .5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;          // 先慢后快再慢
+      const p = from + (to - from) * e;
+      setMask(next, `linear-gradient(#000 ${p - soft}%, transparent ${p + soft}%)`);
+      setMask(heroImg, `linear-gradient(transparent ${p - soft}%, #000 ${p + soft}%)`);
+      if (k < 1) return requestAnimationFrame(step);
+      heroImg.src = L.img;
+      heroImg.decode().catch(() => {}).then(() => { setMask(heroImg, ""); next.remove(); });
+    };
+    requestAnimationFrame(step);
+  };
+  next.decode ? next.decode().then(run, run) : (next.onload = run);
+  $("dReason").textContent = L.reason;
+  $("dReason").animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 200, easing: "ease-out", fill: "backwards" });
+}
+function refreshUndo() { $("dUndo").classList.toggle("on", !!edited[cur]); }
+
+function send() {
+  if (!editing || generating) return;
+  if (!askInput.value.trim()) { askInput.value = askInput.placeholder; placeAsk(lastTap.x, lastTap.y); }
+  $("askSend").animate([{ transform: "scale(.86)" }, { transform: "none" }], { duration: 220, easing: "ease-out" });
+  const it = editing, prompt = askInput.value.trim();
+  const isDemo = cur === DEMO.look && it.cat === DEMO.cat && !edited[cur];
+  if (!isDemo) {                            // 演示没预设的改法：收起输入框，屏幕中间提示
+    closeEdit();
+    toast(`演示版本只预设了「${LOOKS[DEMO.look].cn}」${DEMO.doing}`);
+    return;
+  }
+  generating = true;
+  // 输入框和键盘收起，黑点留下，旁边出现「正在…」
+  ask.classList.remove("on");
+  askInput.blur();
+  showKeyboard(false);
+  liftSelect(null);
+  setTimeout(() => {
+    showTip(`正在${DEMO.doing}<i></i><i></i><i></i>`);
+    fxSelect(it, true);                     // 光贴着这件衣服反复扫
+  }, 250);
+
+  setTimeout(() => {
+    genTip.classList.remove("on");
+    const L = LOOKS[cur];
+    edited[cur] = { img: L.img, thumb: L.thumb, reason: L.reason };
+    swapLook(cur, { img: DEMO.img, thumb: DEMO.thumb, reason: DEMO.reason });
+    setTimeout(() => fxSelect(null), 250);                  // 擦的同时，光慢慢收掉
+    setTimeout(() => { finish(); refreshUndo(); nudgeWear(); stage(7); }, 1100);
+  }, 3600);
+
+  function finish() {
+    generating = false;
+    editing = null;
+    detail.classList.remove("editing");
+    pin.classList.remove("on");
+  }
+}
+
+function nudgeWear() {
+  const b = $("btnWear");
+  b.classList.remove("ready"); b.offsetWidth; b.classList.add("ready");
+}
+
+/* ---- 底部按钮 ---- */
+// 问问 AI：改整体（场合、风格方向），和「点单品改局部」互补
+$("btnAi").addEventListener("click", () => {
+  if (generating || busy) return;
+  const w = dStage.offsetWidth;
+  openEdit({ cat: "look", label: "整套", name: "整套" }, w / 2 - 90, 140);
+});
+/* ---- 就穿这套 → 模特身上的单品「拆」下来，飞到卡片上落成分层平铺 → 拍立得白边长出来 ---- */
+const ending = $("ending"), card = $("card"), cPhoto = $("cPhoto");
+// 平铺的位置（按照片区域的比例 [左, 上, 右, 下]）和一点点倾斜，参考「穿在身上的关系」叠放
+const SLOTS = {
+  outer:  { box: [.02, .03, .60, .66], rot: -3 },
+  top:    { box: [.40, .02, .93, .44], rot: 3 },
+  topSolo:{ box: [.04, .04, .58, .50], rot: -3 },
+  pants:  { box: [.50, .30, .97, .97], rot: 2 },
+  skirt:  { box: [.47, .38, .97, .86], rot: -2 },
+  bag:    { box: [.05, .66, .40, .88], rot: 6 },
+  shoes:  { box: [.30, .80, .64, .99], rot: -4 },
+};
+const LAYER = ["top", "bottom", "outer", "shoes", "bag"];      // 从下到上的叠放顺序
+
+function cardItems() {
+  const list = LOOK_ITEMS[cur].map(it => ({ ...it }));
+  if (edited[cur] && cur === DEMO.look) {                       // 改成裙子之后，卡片上也是裙子
+    const b = list.find(it => it.cat === "bottom");
+    b.id = DEMO.bottomId; b.name = DEMO.bottomName;
+  }
+  const hasOuter = list.some(it => it.cat === "outer");
+  return LAYER.map(cat => list.find(it => it.cat === cat)).filter(Boolean).map(it => {
+    const key = it.cat === "top" ? (hasOuter ? "top" : "topSolo") : it.cat === "bottom" ? (/裙/.test(it.name) ? "skirt" : "pants") : it.cat;
+    return { it, slot: SLOTS[key] };
+  });
+}
+
+function weekday(d) { return "周" + "日一二三四五六"[d.getDay()]; }
+
+$("btnWear").addEventListener("click", () => {
+  if (busy || generating || editing) return;
+  busy = true;
+  $("btnWear").animate([{ transform: "scale(.96)" }, { transform: "none" }], { duration: 220, easing: "ease-out" });
+
+  // 卡片内容
+  const L = LOOKS[cur], now = new Date();
+  $("cEn").textContent = L.en;
+  $("cCn").textContent = L.cn;
+  $("cDate").textContent = `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} ${weekday(now)}`;
+  $("cWeather").textContent = WEATHER;
+  cPhoto.innerHTML = "";
+  card.classList.remove("framed");
+  ending.classList.remove("done");
+  ending.classList.add("open");
+
+  const items = cardItems();
+  const pieces = items.map(({ it, slot }) => {
+    const el = document.createElement("div");
+    el.className = "piece";
+    const [x0, y0, x1, y1] = slot.box;
+    Object.assign(el.style, { left: x0 * 292 + "px", top: y0 * 360 + "px", width: (x1 - x0) * 292 + "px", height: (y1 - y0) * 360 + "px" });
+    el.innerHTML = `<img src="assets/card/${it.id}.webp" alt="">`;
+    cPhoto.appendChild(el);
+    return { el, it, slot };
+  });
+
+  // 详情页的其他元素淡出，模特随后淡出
+  const outs = [$("dTop"), $("dTitle"), $("prev"), $("next"), $("dCap"), strip, $("dActions")];
+  outs.forEach(el => el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: "ease-in", fill: "forwards" }));
+  hero.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, delay: 120, easing: "ease-in", fill: "forwards" });
+
+  // 每件单品从它在模特身上的位置，飞到卡片上的位置
+  const hr = hero.getBoundingClientRect();
+  Promise.all(pieces.map(p => p.el.querySelector("img").decode().catch(() => {}))).then(() => {
+    pieces.forEach((p, n) => {
+      const to = p.el.querySelector("img").getBoundingClientRect();
+      const [bx0, by0, bx1, by1] = p.it.box;
+      const from = { left: hr.left + bx0 * hr.width, top: hr.top + by0 * hr.height, width: (bx1 - bx0) * hr.width, height: (by1 - by0) * hr.height };
+      const sc = Math.min(from.width / to.width, from.height / to.height);
+      const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+      const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+      p.el.animate([
+        { transform: `translate(${dx}px,${dy}px) scale(${sc})`, opacity: 0 },
+        { opacity: 1, offset: .2 },
+        { transform: `rotate(${p.slot.rot}deg)`, opacity: 1 },
+      ], { duration: 820, delay: 160 + n * 70, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" });
+    });
+    // 单品快落定时，拍立得的白边和米色底出现
+    setTimeout(() => card.classList.add("framed"), 780);
+    card.animate([{ transform: "scale(.94)" }, { transform: "none" }], { duration: 700, delay: 760, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+    setTimeout(() => { ending.classList.add("done"); busy = false; stage(8); }, 1250);
+  });
+});
+
+// 回到衣柜
+$("eBack").addEventListener("click", () => {
+  if (busy) return;
+  busy = true;
+  wardrobe.style.display = "";      // 衣柜先垫在卡片和详情页下面，淡出时直接露出衣柜，不会闪过网格
+  ending.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 320, easing: "ease-in", fill: "forwards" });
+  detail.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 320, easing: "ease-in", fill: "forwards" }).onfinish = () => {
+    ending.classList.remove("open", "done");
+    ending.getAnimations().forEach(a => a.cancel());
+    detail.getAnimations().forEach(a => a.cancel());
+    [$("dTop"), $("dTitle"), $("prev"), $("next"), $("dCap"), strip, $("dActions"), hero].forEach(el => el.getAnimations().forEach(a => a.cancel()));
+    detail.classList.remove("open");
+    if (cur !== focus) { off = targetFor(cur, off); render(); }
+    cells.forEach(c => c.el.style.visibility = "");
+    render();
+    busy = false;
+    stage(2);
+  };
+});
+$("gBack").addEventListener("click", () => {
+  if (busy && !loading) return;
+  if (loading) { stopLoading(); busy = false; gLoading.classList.remove("on"); }   // loading 中途也能返回
+  openWardrobe();
+});
+
+// 撤回：回到改之前的样子（只撤一步）
+$("dUndo").addEventListener("click", () => {
+  if (!edited[cur] || generating) return;
+  const before = edited[cur];
+  delete edited[cur];
+  stage(5);
+  swapLook(cur, before);
+  refreshUndo();
+});
+$("askSend").addEventListener("click", send);
+
+/* ============ 演示引导（只在展示页里出现）：像 Figma 原型的热区，在下一步该点的地方闪一下蓝框 ============ */
+// 只是叠在上面的一层画面，不挡点击，也不改任何按钮的逻辑
+const flowHint = document.createElement("div");
+flowHint.className = "flow-hint";
+flowHint.setAttribute("aria-hidden", "true");
+if (EMBED) document.body.appendChild(flowHint);
+let hintKey = null, hintChangedAt = 0, hintQuietSince = 0, hintFlashed = false, hintLast = null;
+
+// 现在该点哪里：返回 { key, r }（r 是屏幕上的矩形），没有就返回 null
+function hintTarget() {
+  const box = el => ({ key: el.id || el.className, r: el.getBoundingClientRect() });
+  if (ending.classList.contains("open") || performance.now() < 1200) return null;   // 开屏弹窗出现前先不闪
+  if (sheetWrap.classList.contains("on")) return box($("sGo"));
+  if (sheetWrap.classList.contains("open")) return null;                          // 弹窗正在收起
+  if (wardrobe.style.display !== "none") {
+    if (picked.has("anchor-shirt")) return picked.size === 1 ? box($("wAi")) : null;   // 多选了别的：交给 toast 说明
+    const R = racks[0];
+    return { key: "shirt", r: R.hangs[R.list.findIndex(x => x.id === "anchor-shirt")].querySelector(".cloth").getBoundingClientRect() };
+  }
+  if (detail.classList.contains("open")) {
+    if (busy || generating) return null;
+    if (cur !== DEMO.look) return { key: "thumb", r: thumbs[DEMO.look].getBoundingClientRect() };
+    if (edited[cur]) return editing ? null : box($("btnWear"));
+    const pants = LOOK_ITEMS[cur].find(it => it.cat === DEMO.cat);
+    if (editing && editing === pants) return box($("askSend"));
+    const r = hero.getBoundingClientRect(), [x0, y0, x1, y1] = pants.box;
+    return { key: "pants", r: { left: r.left + x0 * r.width, top: r.top + y0 * r.height, right: r.left + x1 * r.width, bottom: r.top + y1 * r.height } };
+  }
+  // 网格：第 20 套做好了才指它，范围只算模特本身（和点击判断一致）
+  if (busy || isPending(DEMO.look)) return null;
+  const c = cells[DEMO.look].el;
+  if (c.style.visibility === "hidden") return null;
+  const r = c.getBoundingClientRect(), cx = r.left + r.width / 2, w = r.width * .32;
+  return { key: "look", r: { left: cx - w, top: r.top + r.height * .03, right: cx + w, bottom: r.bottom - r.height * .03 } };
+}
+
+function paintHint() {
+  const t = hintTarget(), now = performance.now();
+  const key = t && t.key;
+  if (key !== hintKey) {
+    flowHint.classList.remove("on");
+    hintKey = key; hintChangedAt = hintQuietSince = now; hintFlashed = false;
+  }
+  if (t) {
+    const p = $("phone").getBoundingClientRect();
+    const left = Math.max(t.r.left, p.left), top = Math.max(t.r.top, p.top);
+    const w = Math.min(t.r.right, p.right) - left, h = Math.min(t.r.bottom, p.bottom) - top;
+    // 目标还在动（弹簧吸附、转场、loading 散开），就等它停稳再闪
+    if (!hintLast || Math.abs(hintLast.left - left) + Math.abs(hintLast.top - top) + Math.abs(hintLast.w - w) + Math.abs(hintLast.h - h) > .5) hintQuietSince = now;
+    hintLast = { left, top, w, h };
+    flowHint.style.cssText = `left:${left}px;top:${top}px;width:${w}px;height:${h}px`;
+    if (!hintFlashed && w > 4 && h > 4 && now - hintChangedAt >= 400 && now - hintQuietSince >= 150) {
+      flowHint.classList.add("on");
+      hintFlashed = true;
+    }
+  } else { flowHint.classList.remove("on"); hintLast = null; }
+  requestAnimationFrame(paintHint);
+}
+if (EMBED) requestAnimationFrame(paintHint);
+
+// 点错地方（或者弹出了演示提示）：等画面稳定后，在该点的地方再闪一次
+function hintAgain() {
+  if (!EMBED) return;
+  const key = hintKey;
+  setTimeout(() => {
+    if (hintKey !== key) return;
+    flowHint.classList.remove("on"); flowHint.offsetWidth;
+    hintFlashed = false; hintChangedAt = performance.now() - 400;
+  }, 350);
+}
+let hintDown = null;
+document.addEventListener("pointerdown", e => { hintDown = { x: e.clientX, y: e.clientY }; }, true);
+document.addEventListener("pointerup", e => {
+  if (!hintDown || !hintLast) return;
+  const tap = Math.hypot(e.clientX - hintDown.x, e.clientY - hintDown.y) < 8;
+  hintDown = null;
+  const { left, top, w, h } = hintLast;
+  const inside = e.clientX >= left && e.clientX <= left + w && e.clientY >= top && e.clientY <= top + h;
+  if (tap && !inside) hintAgain();      // 拖动不算点错
+}, true);
+</script>
+</body>
+</html>

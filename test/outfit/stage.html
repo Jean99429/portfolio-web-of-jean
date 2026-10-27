@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Outfit AI 展示页</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&family=Lora:ital@0;1&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#111111;
+  --ink-2:#6f6c66;
+  --ink-3:#aaa69e;
+  /* 墙上的字（--w-）和纸上的字（--ink）分开，墙变深时只换墙上的字 */
+  --wall:#272624;
+  --w-ink:#f1efeb;
+  --w-ink-2:#9a968e;
+  --paper:#f6f5f2;
+  --tape:rgba(190,152,104,.85);
+  --grain:.6;
+  --sans:"Montserrat","Noto Sans SC",sans-serif;
+  --serif:"Lora","Noto Sans SC",serif;
+  --cn:"Noto Sans SC","PingFang SC",sans-serif;
+  --ease-out:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+/* 墙面：炭灰工作室墙 + 很淡的纸纹；便签用牛皮纸胶带贴 */
+body{background:var(--wall);color:var(--w-ink);font-family:var(--cn);-webkit-font-smoothing:antialiased;overflow:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45  0 0 0 0 .42  0 0 0 0 .38  0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+.wall{position:relative;height:100%;display:grid;grid-template-columns:minmax(240px,1fr) auto minmax(260px,1fr);align-items:center;gap:clamp(24px,4vw,72px);padding:0 clamp(24px,4vw,64px)}
+.label{font:400 10px/1 var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--w-ink-2)}
+
+/* ---------- 左：步骤列表。平时只是墙上的一行字，当前这一步变成一张用胶带贴住的横条便签 ---------- */
+.left{justify-self:end;width:100%;max-width:300px}
+.masthead{margin-bottom:28px}
+.masthead .t{font:500 15px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;margin-top:10px}
+.plan{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.page{position:relative;display:flex;align-items:center;gap:10px;width:230px;height:30px;padding:0 14px;color:var(--w-ink-2);opacity:.6;
+  transition:background-color .35s ease,color .35s ease,opacity .35s ease,transform .45s var(--ease-out),box-shadow .35s ease}
+.page .n{font:500 9px/1 var(--sans);letter-spacing:.14em}
+.page .c{font:400 12px/1 var(--cn);letter-spacing:.04em}
+.page.seen{opacity:.9}
+.page.on{opacity:1;background:var(--paper);color:var(--ink);transform:rotate(-1deg);box-shadow:0 1px 1px rgba(0,0,0,.08),0 6px 14px rgba(0,0,0,.18)}
+/* 左端一小截胶带 */
+.page::after{content:"";position:absolute;left:-9px;top:50%;width:22px;height:11px;margin-top:-6px;background:var(--tape);transform:rotate(-12deg) scale(.6);opacity:0;
+  transition:opacity .3s ease,transform .35s var(--ease-out)}
+.page.on::after{opacity:1;transform:rotate(-12deg)}
+/* 重新体验：不是贴在墙上的纸，是一个按钮（细描边胶囊），和纸条区分开 */
+.restart{margin-top:24px;display:flex;align-items:center;gap:7px;height:32px;padding:0 16px;border-radius:16px;border:1px solid rgba(241,239,235,.35);
+  font:400 12px/1 var(--cn);letter-spacing:.06em;color:var(--w-ink);transition:scale .15s ease,background-color .2s ease,border-color .2s ease}
+.restart:hover{background:rgba(241,239,235,.08);border-color:rgba(241,239,235,.6)}
+.restart:active{scale:.96}
+.restart svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+/* 下一步提示：挂在当前纸条下面一行，跟着纸条走 */
+.hint{padding:6px 0 4px 38px;font:italic 400 12px/1.5 var(--serif);color:var(--w-ink)}
+
+/* ---------- 中：手机原型（可以玩），按窗口高度缩放 ---------- */
+.phone-slot{position:relative}
+.phone-slot iframe{position:absolute;left:0;top:0;width:560px;height:960px;border:0;background:transparent;transform-origin:0 0}
+
+/* ---------- 右：编辑便签 ---------- */
+.right{justify-self:start;width:100%;max-width:300px}
+.notes{position:relative;margin-top:22px;min-height:420px}
+.note{position:relative;width:200px;aspect-ratio:1;background:var(--paper);padding:22px 18px 16px;margin-bottom:20px;
+  box-shadow:0 1px 1px rgba(0,0,0,.08),0 8px 18px rgba(0,0,0,.22)}
+/* 图钉：顶部正中钉住，下面一小块投影 */
+.note{color:var(--ink)}
+.note::before{content:"";position:absolute;left:50%;top:8px;width:10px;height:10px;margin-left:-5px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#d9b98c,#9a7346 70%,#6e5030);box-shadow:1px 3px 3px rgba(0,0,0,.28)}
+.note .n{font:500 9px/1 var(--sans);letter-spacing:.2em;color:var(--ink-3)}
+.note h3{font:400 14px/1.4 var(--cn);letter-spacing:.04em;margin-top:8px}
+.note p{font:300 12px/1.75 var(--cn);color:var(--ink-2);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wall">
+  <section class="left">
+    <div class="masthead">
+      <div class="label">Design Test · Prototype</div>
+      <div class="t">Outfit AI</div>
+    </div>
+    <div class="plan" id="plan"></div>
+  </section>
+
+  <div class="phone-slot" id="slot">
+    <iframe id="proto" src="index.html" title="可交互原型"></iframe>
+  </div>
+
+  <section class="right">
+    <div class="label">Editor’s Notes</div>
+    <div class="notes" id="notes"></div>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+// 每一步：步骤名、下一步提示、右边的便签
+const STEPS = [
+  { c: "开屏", next: "点「用这件生成搭配」", notes: [
+    ["可视化衣柜", "单品按穿衣顺序挂在衣架上，打开即可预览整个衣柜，不用翻列表。"],
+    ["弹窗提醒", "推荐一件很久没穿的单品，给用户一个开始搭配的理由，引导进入后续操作。"]] },
+  { c: "衣柜", next: "点底部「用这件生成搭配」", notes: [
+    ["零提问", "不问场合和风格，用户只需选一件想穿的。天气和地点自动获取。"],
+    ["选中即保留", "选中的单品一定出现在方案里，其余由 AI 补齐。"]] },
+  { c: "生成中", next: "不用等，拖动网格先看已经好的", notes: [
+    ["先给方案，再做选择", "用户很难描述想要的风格，但看到方案能马上判断。所以直接生成，不先提问。"],
+    ["分批生成", "中心 6 套优先完成，用户可以先浏览，不用等 20 套全部生成。"]] },
+  { c: "挑一套", next: "点进「深夜爵士酒吧」看细节", notes: [
+    ["凸透镜网格", "中间放大、边缘缩小，一屏同时预览多套，效果一眼可见。"],
+    ["直接穿在身上", "每套都是穿在用户形象上的效果，比平铺单品更直观，能直接判断适不适合自己。"],
+    ["场景化命名", "用「画廊开幕夜」这类场景命名，快速区分每套的方向。"]] },
+  { c: "看细节", next: "点模特身上的裤子", notes: [
+    ["大图预览", "放大查看这一套的单品细节和搭配理由。"],
+    ["切换方案", "底部横滑直接切换到其他方案的详情，不用返回网格。"]] },
+  { c: "局部修改", next: "不用打字，直接发送灰色那句", notes: [
+    ["单品精细修改", "直接点模特身上的单品，输入框在点击位置出现，一句话完成修改。选中、输入、生成一气呵成。"]] },
+  { c: "改好了", next: "满意就点「就穿这套」", notes: [
+    ["直接替换", "修改结果直接替换原方案，不新增版本，其他单品保持不变。"]] },
+  { c: "今日穿搭", next: "点左边「重新体验」再走一遍", notes: [
+    ["有仪式感的结尾", "确认不是点一下就结束，而是得到一张能留下、能分享的卡片。"],
+    ["闭环", "今天选了哪套、改了什么，都会回到 AI 对你的理解里，下次推荐更准。"]] },
+];
+const pad = n => String(n).padStart(2, "0");
+
+// 步骤列表：8 行 + 「重新体验」标签
+$("plan").innerHTML = STEPS.map((s, i) => `<div class="page" data-i="${i}"><span class="n">${pad(i + 1)}</span><span class="c">${s.c}</span></div>`).join("")
+  + `<button class="restart" id="restart"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg>重新体验</button>`;
+const pages = [...document.querySelectorAll(".page")];
+const hint = document.createElement("div");
+hint.className = "hint";
+
+// 换到某一步：纸条亮起，下一步提示挪到它下面；右边旧便签淡出，新便签一张张钉上来
+let cur = -1;
+const seen = new Set();
+function show(i) {
+  if (i === cur) return;
+  cur = i; seen.add(i);
+  const s = STEPS[i];
+  pages.forEach((p, n) => { p.classList.toggle("on", n === i); p.classList.toggle("seen", seen.has(n) && n !== i); });
+
+  hint.textContent = "→ " + s.next;
+  pages[i].after(hint);
+  hint.animate([{ opacity: 0, transform: "translateY(-4px)" }, { opacity: 1, transform: "none" }],
+    { duration: 420, delay: 120, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+
+  const box = $("notes"), old = [...box.children];
+  old.forEach(el => el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: "ease-in", fill: "forwards" }));
+  setTimeout(() => {
+    box.innerHTML = s.notes.map(([h, p], n) => {
+      const rot = [-1.2, .9, -.6][n % 3];
+      return `<div class="note" style="transform:rotate(${rot}deg);margin-left:${[0, 34, 10][n % 3]}px"><div class="n">Note ${pad(n + 1)}</div><h3>${h}</h3><p>${p}</p></div>`;
+    }).join("");
+    [...box.children].forEach((el, n) => {
+      const rot = el.style.transform;
+      el.animate([
+        { opacity: 0, transform: `${rot} translateY(-10px) scale(1.03)` },
+        { opacity: 1, transform: `${rot}` },
+      ], { duration: 520, delay: n * 140, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+    });
+  }, old.length ? 190 : 0);
+}
+
+// 原型告诉我们走到了第几步
+window.addEventListener("message", e => {
+  const n = e.data && e.data.outfitStep;
+  if (n >= 1 && n <= STEPS.length) show(n - 1);
+});
+
+// 重新体验：原型从头加载（回到开屏弹窗）
+$("restart").addEventListener("click", () => {
+  seen.clear();
+  $("proto").src = "index.html?r=" + Date.now();   // 直接换地址重载（本地打开时不能跨页面调用 reload）
+});
+
+// 手机按窗口高度缩放：上下留出空白，最大不超过原大小
+function fit() {
+  const k = Math.min(1, (innerHeight - 16) / 960);   // iframe 里手机上下本身留了 48px
+  const f = $("proto");
+  f.style.transform = `scale(${k})`;
+  $("slot").style.width = 560 * k + "px";
+  $("slot").style.height = 960 * k + "px";
+}
+addEventListener("resize", fit);
+fit();
+show(0);
+</script>
+</body>
+</html>
